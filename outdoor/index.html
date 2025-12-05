@@ -28,7 +28,6 @@
 </head>
 
 <body>
-
   <!-- ========== 사이드바 ========== -->
   <aside class="sidebar">
     <div class="side-header">
@@ -93,7 +92,6 @@
 
   <!-- ========== 메인 영역 ========== -->
   <main class="main">
-
     <!-- 상단 제목 -->
     <header class="main-header">
       <div class="main-header-left">
@@ -121,10 +119,8 @@
     <div class="layout-grid">
       <!-- 왼쪽 메인 영역 -->
       <div class="left-main">
-
         <!-- 상단: 지도 + 그래프 -->
         <section class="top-grid">
-
           <!-- 지도 카드 -->
           <article class="card">
             <div class="card-header">
@@ -194,12 +190,10 @@
               </div>
             </div>
           </article>
-
         </section>
 
         <!-- 하단 요약 카드 3개 -->
         <section class="bottom-grid">
-
           <article class="card">
             <div class="card-title">전도 위험 High 수목</div>
             <div class="metric-main">3주</div>
@@ -226,7 +220,6 @@
             </div>
             <span class="metric-badge-ok">관수 지시 없이 “점검 우선순위”만 안내</span>
           </article>
-
         </section>
 
         <!-- 전도 위험 AI 테스트 패널 -->
@@ -268,7 +261,6 @@
           </div>
         </section>
         <!-- 전도 위험 AI 테스트 패널 끝 -->
-
       </div>
 
       <!-- 오른쪽: 기상·강풍 + 자동 경보 패널 -->
@@ -359,7 +351,7 @@
       </aside>
     </div>
 
-    <!-- ===== 수목 상세 정보/편집 패널 (지도에서 수목 클릭 시 사용) ===== -->
+    <!-- ===== 수목 상세 정보/편집 패널 ===== -->
     <aside class="tree-detail-panel">
       <div class="tree-detail-header">
         <div id="treeTitle">-</div>
@@ -373,7 +365,6 @@
       </div>
 
       <div class="tree-detail-body">
-        <!-- ID (읽기 전용) -->
         <div class="tree-field">
           <label class="field-label" for="treeId">수목 ID</label>
           <div class="field-input-wrap">
@@ -381,7 +372,6 @@
           </div>
         </div>
 
-        <!-- 수종 -->
         <div class="tree-field">
           <label class="field-label" for="treeSpecies">수종명</label>
           <div class="field-input-wrap">
@@ -389,7 +379,6 @@
           </div>
         </div>
 
-        <!-- 구역 -->
         <div class="tree-field">
           <label class="field-label" for="treeZone">구역</label>
           <div class="field-input-wrap">
@@ -397,7 +386,6 @@
           </div>
         </div>
 
-        <!-- 유형 -->
         <div class="tree-field">
           <label class="field-label" for="treeType">유형</label>
           <div class="field-input-wrap">
@@ -409,7 +397,6 @@
           </div>
         </div>
 
-        <!-- 상태 -->
         <div class="tree-field">
           <label class="field-label" for="treeStatusSelect">상태</label>
           <div class="field-input-wrap">
@@ -421,7 +408,6 @@
           </div>
         </div>
 
-        <!-- 수고(H) -->
         <div class="tree-field">
           <label class="field-label" for="treeHeight">수고(H)</label>
           <div class="field-input-wrap">
@@ -430,7 +416,6 @@
           </div>
         </div>
 
-        <!-- 흉고 직경 -->
         <div class="tree-field">
           <label class="field-label" for="treeDbh">흉고 직경</label>
           <div class="field-input-wrap">
@@ -439,7 +424,6 @@
           </div>
         </div>
 
-        <!-- 수관 폭 -->
         <div class="tree-field">
           <label class="field-label" for="treeCrown">수관 폭</label>
           <div class="field-input-wrap">
@@ -448,7 +432,6 @@
           </div>
         </div>
 
-        <!-- 메모 -->
         <div class="tree-field">
           <label class="field-label" for="treeMemo">메모</label>
           <div class="field-input-wrap">
@@ -458,23 +441,20 @@
       </div>
 
       <div class="tree-actions">
-        <button id="btnTreeEdit"   class="btn-secondary" type="button">수정</button>
+        <button id="btnTreeEdit" class="btn-secondary" type="button">수정</button>
         <button id="btnTreeSaveDetail" class="btn-primary" type="button">저장</button>
         <button id="btnTreeCancel" class="btn-ghost" type="button">취소</button>
       </div>
     </aside>
     <!-- ===== 수목 상세 패널 끝 ===== -->
-
   </main>
 
   <!-- ========== JS 로딩 (루트 기준 경로) ========== -->
-<script src="../js/map.js"></script>
-<script src="../js/trees.js"></script>
-<script src="../js/riskApi.js"></script>
-<script src="../js/chart.js"></script>
-<script src="../js/weather.js"></script>
-  <!-- 전도 위험 AI 연동 스크립트 -->
+  <script src="/js/map.js"></script>
+  <script src="/js/trees.js"></script>
   <script src="/js/riskApi.js"></script>
+  <script src="/js/chart.js"></script>
+  <script src="/js/weather.js"></script>
 
   <script>
     // 모바일 햄버거 버튼으로 사이드바 열기/닫기
