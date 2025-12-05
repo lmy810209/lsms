@@ -1,1 +1,619 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>LSMS INDOOR · 양재 HQ 실내조경 대시보드</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 공통 스타일 (실외와 동일) -->
+  <link rel="stylesheet" href="/css/style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --indoor-navy: #0b3b70;
+      --indoor-bg: #f3f4f6;
+      --indoor-card: #ffffff;
+      --indoor-border: #e5e7eb;
+      --indoor-text-main: #111827;
+      --indoor-text-sub: #6b7280;
+      --indoor-accent: #2563eb;
+    }
+
+    body {
+      margin: 0;
+      background: var(--indoor-bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+      color: var(--indoor-text-main);
+    }
+
+    /* 상단 네비게이션 바 */
+    .indoor-topbar {
+      height: 56px;
+      background: var(--indoor-navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      color: #f9fafb;
+    }
+
+    .indoor-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .indoor-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .indoor-logo-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #f9fafb;
+      color: var(--indoor-navy);
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .indoor-topnav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+    }
+
+    .indoor-topnav-item {
+      cursor: pointer;
+      opacity: 0.85;
+    }
+
+    .indoor-topnav-item.active {
+      font-weight: 600;
+      opacity: 1;
+      position: relative;
+    }
+
+    .indoor-topnav-item.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -10px;
+      height: 2px;
+      border-radius: 999px;
+      background: #fcd34d;
+    }
+
+    .indoor-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .indoor-user-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    /* 메인 레이아웃 */
+    .indoor-main {
+      max-width: 1280px;
+      margin: 18px auto 32px;
+      padding: 0 16px 16px;
+    }
+
+    .indoor-page-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .indoor-page-title h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .indoor-page-tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #facc15;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .indoor-breadcrumb {
+      font-size: 12px;
+      color: var(--indoor-text-sub);
+      margin-bottom: 18px;
+    }
+
+    /* 요약 카드 그리드 */
+    .indoor-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 1024px) {
+      .indoor-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .indoor-summary-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .indoor-card {
+      background: var(--indoor-card);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.06),
+        0 0 0 1px rgba(148, 163, 184, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 110px;
+    }
+
+    .indoor-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .indoor-card-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: #eef2ff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .indoor-card-label {
+      font-size: 13px;
+      color: var(--indoor-text-sub);
+    }
+
+    .indoor-card-value {
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .indoor-card-footer {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+
+    /* 그래프 2개 영역 */
+    .indoor-charts-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.4fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .indoor-charts-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .indoor-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .indoor-card-sub {
+      font-size: 11px;
+      color: var(--indoor-text-sub);
+      margin-bottom: 10px;
+    }
+
+    .indoor-chart-box {
+      min-height: 220px;
+    }
+
+    /* 층별 조경 배치도 */
+    .indoor-layout-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .indoor-layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .indoor-building-cols {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+    }
+
+    .indoor-building-col {
+      flex: 1;
+      background: #eff6ff;
+      border-radius: 14px;
+      padding: 10px 10px 12px;
+    }
+
+    .indoor-building-col-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .indoor-floor-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .indoor-floor-badge {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      font-size: 11px;
+      text-align: center;
+      cursor: default;
+    }
+
+    .indoor-attrium-label {
+      font-weight: 600;
+      margin: 8px 0 4px;
+      text-align: center;
+    }
+
+    .indoor-attrium-badge {
+      display: block;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: #facc15;
+      font-size: 11px;
+      text-align: center;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    .indoor-info-list {
+      font-size: 12px;
+      color: var(--indoor-text-sub);
+      margin-top: 6px;
+    }
+
+    .indoor-info-list li {
+      margin-bottom: 4px;
+    }
+
+    .indoor-footer-note {
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: right;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 상단 네비게이션 -->
+  <header class="indoor-topbar">
+    <div class="indoor-topbar-left">
+      <div class="indoor-logo">
+        <div class="indoor-logo-mark">LS</div>
+        <span>LSMS</span>
+      </div>
+      <nav class="indoor-topnav">
+        <div class="indoor-topnav-item active">대시보드</div>
+        <div class="indoor-topnav-item">관리 ▾</div>
+        <div class="indoor-topnav-item">AI 식물 분석</div>
+      </nav>
+    </div>
+    <div class="indoor-topbar-right">
+      <span style="font-size:11px; opacity:0.8;">시스템 상태: <span style="color:#fbbf24;">불명</span></span>
+      <div class="indoor-user-pill">
+        <span>lmy8129</span>
+        <span style="opacity:0.8;">관리자</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 내용 -->
+  <main class="indoor-main">
+    <div class="indoor-page-title">
+      <h1>대시보드</h1>
+      <div class="indoor-page-tag">관리자</div>
+    </div>
+    <div class="indoor-breadcrumb">양재 HQ · 실내조경 관리 현황</div>
+
+    <!-- 상단 요약 카드 -->
+    <section class="indoor-summary-grid">
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">🌱</div>
+          <div>
+            <div class="indoor-card-label">등록된 식물</div>
+            <div class="indoor-card-value">1</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">실내 조경 구역에 등록된 전체 개체 수</div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">👥</div>
+          <div>
+            <div class="indoor-card-label">작업자</div>
+            <div class="indoor-card-value">3</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">실내 조경에 배정된 상시 작업 인원</div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">🗓</div>
+          <div>
+            <div class="indoor-card-label">오늘의 작업</div>
+            <div class="indoor-card-value">1</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">금일 예정된 작업 중 0건 완료</div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">📈</div>
+          <div>
+            <div class="indoor-card-label">오늘 완료율</div>
+            <div class="indoor-card-value">0.0%</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">완료된 작업/전체 작업 비율</div>
+      </article>
+    </section>
+
+    <!-- 중간 카드 (미완료 작업, 활동 작업자 등) -->
+    <section class="indoor-summary-grid" style="margin-bottom:20px;">
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">⏰</div>
+          <div>
+            <div class="indoor-card-label">미완료 작업</div>
+            <div class="indoor-card-value">7</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">최근 일주일 기준 미완료 작업 건수</div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">🟣</div>
+          <div>
+            <div class="indoor-card-label">활동 작업자</div>
+            <div class="indoor-card-value">3</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">최근 3일 내 기록을 남긴 작업자</div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">📂</div>
+          <div>
+            <div class="indoor-card-label">리포트</div>
+            <div class="indoor-card-value">보고서</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">주간·월간 자동 보고서 생성 현황</div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-header">
+          <div class="indoor-card-icon">💧</div>
+          <div>
+            <div class="indoor-card-label">급수량 통계</div>
+            <div class="indoor-card-value">분석</div>
+          </div>
+        </div>
+        <div class="indoor-card-footer">식물별 급수량/관수 패턴 분석</div>
+      </article>
+    </section>
+
+    <!-- 차트 2개 -->
+    <section class="indoor-charts-grid">
+      <article class="indoor-card">
+        <div class="indoor-card-title">주간 작업 통계</div>
+        <div class="indoor-card-sub">이번 주 완료/미완료 작업 비율</div>
+        <div class="indoor-chart-box">
+          <canvas id="weeklyTasksChart"></canvas>
+        </div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-title">월간 작업 현황</div>
+        <div class="indoor-card-sub">주차별 완료 작업 추이</div>
+        <div class="indoor-chart-box">
+          <canvas id="monthlyTasksChart"></canvas>
+        </div>
+      </article>
+    </section>
+
+    <!-- 층별 조경 배치도 + 층별 정보 -->
+    <section class="indoor-layout-grid">
+      <article class="indoor-card">
+        <div class="indoor-card-title">HMC 양재 사옥 · 층별 조경 배치도</div>
+        <div class="indoor-card-sub">서관·동관·아트리움 기준 실내조경 관리 구역</div>
+
+        <div class="indoor-building-cols">
+          <!-- 서관 -->
+          <div class="indoor-building-col">
+            <div class="indoor-building-col-title">서관</div>
+            <div class="indoor-floor-list">
+              <div class="indoor-floor-badge">서관 21층</div>
+              <div class="indoor-floor-badge">서관 20층</div>
+              <div class="indoor-floor-badge">서관 19층</div>
+              <div class="indoor-floor-badge">서관 18층</div>
+              <div class="indoor-floor-badge">서관 17층</div>
+              <div class="indoor-floor-badge">서관 16층</div>
+              <div class="indoor-floor-badge">서관 15층</div>
+              <div class="indoor-floor-badge">서관 14층</div>
+              <div class="indoor-floor-badge">서관 13층</div>
+              <div class="indoor-floor-badge">서관 12층</div>
+              <div class="indoor-floor-badge">서관 11층</div>
+              <div class="indoor-floor-badge">서관 10층</div>
+              <div class="indoor-floor-badge">서관 9층</div>
+              <div class="indoor-floor-badge">서관 8층</div>
+              <div class="indoor-floor-badge">서관 7층</div>
+            </div>
+          </div>
+
+          <!-- 동관 -->
+          <div class="indoor-building-col">
+            <div class="indoor-building-col-title">동관</div>
+            <div class="indoor-floor-list">
+              <div class="indoor-floor-badge">동관 21층</div>
+              <div class="indoor-floor-badge">동관 20층</div>
+              <div class="indoor-floor-badge">동관 19층</div>
+              <div class="indoor-floor-badge">동관 18층</div>
+              <div class="indoor-floor-badge">동관 17층</div>
+              <div class="indoor-floor-badge">동관 16층</div>
+              <div class="indoor-floor-badge">동관 15층</div>
+              <div class="indoor-floor-badge">동관 14층</div>
+              <div class="indoor-floor-badge">동관 13층</div>
+              <div class="indoor-floor-badge">동관 12층</div>
+              <div class="indoor-floor-badge">동관 11층</div>
+              <div class="indoor-floor-badge">동관 10층</div>
+              <div class="indoor-floor-badge">동관 9층</div>
+              <div class="indoor-floor-badge">동관 8층</div>
+              <div class="indoor-floor-badge">동관 7층</div>
+            </div>
+          </div>
+
+          <!-- 아트리움 -->
+          <div class="indoor-building-col">
+            <div class="indoor-building-col-title">아트리움</div>
+            <div class="indoor-attrium-label">주요 조경 층</div>
+            <span class="indoor-attrium-badge">아트리움 3층</span>
+            <span class="indoor-attrium-badge">아트리움 2층</span>
+            <span class="indoor-attrium-badge" style="background:#bfdbfe;">로비 B1</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="indoor-card">
+        <div class="indoor-card-title">층별 정보</div>
+        <div class="indoor-card-sub">건물 구조도에서 층을 클릭하면 상세 정보가 들어올 자리</div>
+        <p style="font-size:40px; text-align:center; margin:20px 0 8px;">☝️</p>
+        <p style="font-size:13px; text-align:center; color:var(--indoor-text-sub);">
+          추후: 각 층 클릭 시 실내 조경 면적, 식재 종류, 담당자, 최근 작업 이력 표시
+        </p>
+
+        <ul class="indoor-info-list">
+          <li>층별 식물 수 · 급수량 · 방제 이력 집계</li>
+          <li>층별 담당자 배정 및 작업량 분석</li>
+          <li>IoT 센서(조도·온습도) 연동 시 알림·경보 표시</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="indoor-footer-note">
+      ※ 현재 데이터는 데모 값이며, 추후 LSMS INDOOR 백엔드와 연동 예정입니다.
+    </div>
+  </main>
+
+  <!-- 차트 초기화 스크립트 -->
+  <script>
+    // 주간 작업 도넛 차트
+    const weeklyCtx = document.getElementById('weeklyTasksChart');
+    if (weeklyCtx) {
+      new Chart(weeklyCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['완료', '미완료'],
+          datasets: [{
+            data: [3, 7],
+            backgroundColor: ['#facc15', '#e5e7eb']
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 14, font: { size: 11 } }
+            }
+          },
+          cutout: '65%'
+        }
+      });
+    }
+
+    // 월간 작업 라인 차트
+    const monthlyCtx = document.getElementById('monthlyTasksChart');
+    if (monthlyCtx) {
+      new Chart(monthlyCtx, {
+        type: 'line',
+        data: {
+          labels: ['월', '화', '수', '목', '금', '토', '일'],
+          datasets: [{
+            label: '완료된 작업',
+            data: [5, 7, 11, 9, 14, 4, 8],
+            tension: 0.35,
+            fill: false
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: true,
+              labels: { font: { size: 11 } }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { font: { size: 11 } }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 2, font: { size: 11 } }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
 
