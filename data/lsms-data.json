@@ -1,0 +1,61 @@
+{
+    "trees": [
+        {
+            "id": "YA-01",
+            "name": "소나무",
+            "lat": 37.4642,
+            "lng": 127.0425,
+            "status": "good",
+            "type": "evergreen-tree",
+            "zone": "정문 플라자",
+            "height": 6.5,
+            "dbh": 24,
+            "crownWidth": 4.2,
+            "plantedYear": 2012,
+            "notes": "수관 균형 양호, 겨울철 동해 주의"
+        },
+        {
+            "id": "YA-03",
+            "name": "산벚나무",
+            "lat": 37.4639,
+            "lng": 127.0426,
+            "status": "fair",
+            "type": "deciduous-tree",
+            "zone": "북측 산책로",
+            "height": 5.8,
+            "dbh": 21,
+            "crownWidth": 3.6,
+            "plantedYear": 2010,
+            "notes": "일부 가지 선단 고사, 모니터링 필요"
+        },
+        {
+            "id": "YA-07",
+            "name": "소나무",
+            "lat": 37.464,
+            "lng": 127.043,
+            "status": "fair",
+            "type": "evergreen-tree",
+            "zone": "정문 플라자",
+            "height": 7.2,
+            "dbh": 28,
+            "crownWidth": 4.8,
+            "plantedYear": 2010,
+            "notes": "줄기 수피 손상 부위 관찰 중"
+        },
+        {
+            "id": "YA-05",
+            "name": "신규 소나무",
+            "lat": 37.46435455942407,
+            "lng": 127.04311430454256,
+            "status": "good",
+            "type": "evergreen-tree",
+            "height": 112,
+            "dbh": 212,
+            "crownWidth": null,
+            "plantedYear": null,
+            "notes": "",
+            "zone": "-"
+        }
+    ],
+    "areas": []
+}

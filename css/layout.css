@@ -1,0 +1,363 @@
+/* ===== 사이드바 (접힘 / 펼침) ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 76px; /* 접힌 상태 폭 */
+  background: #020617; /* 거의 검정에 가까운 남색 */
+  color: #ffffff;
+  padding: 16px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.22s ease, transform 0.22s ease;
+  overflow: hidden; /* 접혔을 때 글자/스크롤 숨김 */
+  border-right: 1px solid #111827;
+  z-index: 30;
+}
+
+/* 펼쳐졌을 때: 폭 + 스크롤 (데스크탑 hover) */
+.sidebar:hover {
+  width: 260px;
+  overflow-y: auto;
+}
+
+/* 모바일에서 햄버거로 열렸을 때 */
+.sidebar.sidebar-open {
+  width: 260px;
+  transform: translateX(0);
+  overflow-y: auto;
+  box-shadow: 0 0 40px rgba(15, 23, 42, 0.6);
+}
+
+/* ===== 로고 ===== */
+.side-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.side-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+  color: #0b1120;
+}
+
+.side-title {
+  display: none; /* 접힌 상태에는 숨김 */
+}
+/* hover + sidebar-open 둘 다에서 제목 보이게 */
+.sidebar:hover .side-title,
+.sidebar.sidebar-open .side-title {
+  display: block; /* 펼쳐졌을 때만 보이게 */
+}
+
+.side-title-main {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.side-title-sub {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* ===== 섹션 라벨 ===== */
+.side-section-label {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+  margin-top: 14px;
+  margin-bottom: 6px;
+  display: none; /* 접힌 상태 숨김 */
+}
+/* hover + sidebar-open 둘 다에서 라벨 보이게 */
+.sidebar:hover .side-section-label,
+.sidebar.sidebar-open .side-section-label {
+  display: block;
+}
+
+/* ===== 메뉴 ===== */
+.nav-list {
+  list-style: none;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 6px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.16s ease, transform 0.08s ease;
+  margin-bottom: 4px;
+}
+
+.nav-item:hover {
+  background: #111827;
+  transform: translateX(2px);
+}
+
+.nav-item.active {
+  background: #1d4ed8;
+}
+
+.nav-icon-round {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+
+.nav-item.active .nav-icon-round {
+  border-color: rgba(255, 255, 255, 0.9);
+  background: rgba(15, 23, 42, 0.25);
+}
+
+.nav-label-wrap {
+  display: none; /* 접힌 상태에는 텍스트 숨김 */
+  flex-direction: column;
+}
+/* hover + sidebar-open 둘 다에서 메뉴 텍스트 보이게 */
+.sidebar:hover .nav-label-wrap,
+.sidebar.sidebar-open .nav-label-wrap {
+  display: flex; /* 펼쳐졌을 때만 보이게 */
+}
+
+.nav-label-main {
+  font-size: 13px;
+}
+.nav-label-sub {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: 1px;
+}
+
+/* ===== 사이드바 푸터 ===== */
+.side-footer {
+  margin-top: auto;
+  font-size: 11px;
+  color: #9ca3af;
+  border-top: 1px solid #1e293b;
+  padding-top: 10px;
+  display: none; /* 접힌 상태 숨김 */
+}
+/* hover + sidebar-open 둘 다에서 푸터 보이게 */
+.sidebar:hover .side-footer,
+.sidebar.sidebar-open .side-footer {
+  display: block;
+}
+
+.side-footer-top {
+  margin-bottom: 4px;
+}
+
+/* ===== 메인 영역 ===== */
+.main {
+  margin-left: 76px; /* 접힌 상태 기준 */
+  min-height: 100vh;
+  padding: 18px 24px 24px;
+  transition: margin-left 0.22s ease;
+}
+.sidebar:hover ~ .main {
+  margin-left: 260px; /* 펼쳐졌을 때 여유 확보 (데스크탑) */
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+/* 메인 헤더 왼쪽(햄버거 + 제목) */
+.main-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* 모바일 메뉴 버튼 – 데스크탑에서는 숨김 */
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid #cbd5f5;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 20px;
+  cursor: pointer;
+  margin-right: 10px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.35);
+}
+.mobile-menu-btn:active {
+  background: #020617;
+  opacity: 0.85;
+}
+
+.main-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.main-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.status-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e7f8eb;
+  color: #047857;
+  border: 1px solid #bbf7d0;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+.status-site {
+  color: #4b5563;
+}
+
+/* ===== 메인 레이아웃 (좌: 지도/요약, 우: 기상 패널) ===== */
+.layout-grid {
+  display: grid;
+  grid-template-columns: 3.5fr 1fr; /* 왼쪽 넓게, 오른쪽 날씨 패널 */
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.left-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ===== 상단 그리드 (지도 + 그래프) ===== */
+.top-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 왼쪽 지도 카드 넓게 */
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+/* ===== 지도 / 그래프 ===== */
+.map-area {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e5edf8;
+  height: 520px;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  color: #1f2933;
+  font-size: 13px;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-area {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9fafb;
+  height: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  font-size: 13px;
+}
+
+.chart-placeholder {
+  width: 92%;
+  height: 86%;
+  border-radius: 10px;
+  border: 1px dashed #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+  padding: 0 12px;
+}
+
+/* ===== 하단 요약 카드 ===== */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 6px;
+}
+
+/* ===== 지도 + 수목 리스트 복합 레이아웃 (필요 시) ===== */
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 260px;
+  gap: 12px;
+}
+
+/* ===== 반응형: 태블릿 / 작은 데스크탑 (<=1200px) ===== */
+@media (max-width: 1200px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .right-panel {
+    order: -1; /* 날씨 패널을 위로 */
+  }
+
+  .top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-area,
+  .chart-area {
+    height: 420px;
+  }
+}

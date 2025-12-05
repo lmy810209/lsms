@@ -1,0 +1,521 @@
+/* ===== 카드 공통 ===== */
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.card-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.card-tag {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #4b5563;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-color {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.tag-blue {
+  background: #2563eb;
+}
+.tag-red {
+  background: #ef4444;
+}
+.tag-orange {
+  background: #f97316;
+}
+
+/* ===== 메트릭 배지 ===== */
+.metric-main {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.metric-sub {
+  font-size: 12px;
+  color: #6b7280;
+}
+.metric-badge-ok,
+.metric-badge-warn,
+.metric-badge-danger {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-top: 4px;
+}
+.metric-badge-ok {
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+.metric-badge-warn {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+.metric-badge-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* ===== 기상 패널 ===== */
+.weather-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.weather-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.weather-sub {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.weather-badge-today {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  white-space: nowrap;
+  line-height: 1.2;
+  margin-top: -1px;
+}
+
+.weather-today {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.weather-today-main {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.weather-today-meta {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.weather-today-extra {
+  font-size: 11px;
+  color: #4b5563;
+  text-align: right;
+}
+
+.weather-forecast-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 10px 0 6px;
+}
+
+.weather-forecast-list {
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+
+.weather-forecast-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 1.2fr 1.1fr;
+  padding: 4px 0;
+  border-bottom: 1px dashed #d1d5db;
+  align-items: center;
+  color: #4b5563;
+}
+.weather-forecast-row:last-child {
+  border-bottom: none;
+}
+.weather-forecast-row span:nth-child(2) {
+  color: #6b7280;
+}
+.weather-forecast-row span:nth-child(3) {
+  text-align: right;
+}
+.weather-forecast-row span:nth-child(4) {
+  text-align: right;
+}
+
+.wf-label-main {
+  font-weight: 600;
+  font-size: 11px;
+  color: #111827;
+}
+
+.wf-label-sub {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+/* ===== 알림 리스트 ===== */
+.alert-section-title {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.alert-hint {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.alert-list {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #374151;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 8px 10px;
+}
+
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.alert-item:last-child {
+  margin-bottom: 0;
+}
+
+.alert-dot-high,
+.alert-dot-warn,
+.alert-dot-info {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+.alert-dot-high {
+  background: #dc2626;
+}
+.alert-dot-warn {
+  background: #f97316;
+}
+.alert-dot-info {
+  background: #2563eb;
+}
+
+.alert-main {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.alert-sub {
+  color: #6b7280;
+}
+
+/* ===== 수목 리스트 패널 ===== */
+.tree-list-panel {
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: #f9fafb;
+  padding: 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+}
+
+.tree-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.tree-list-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tree-list-count {
+  color: #6b7280;
+}
+
+.tree-list-search {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.tree-list-search input {
+  flex: 1;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 11px;
+}
+
+.tree-list-search button {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.tree-list-search button:hover {
+  background: #e5e7eb;
+}
+
+.tree-list-body {
+  flex: 1;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  padding: 5px 6px;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  gap: 6px;
+}
+
+.tree-row:last-child {
+  border-bottom: none;
+}
+
+.tree-row:hover {
+  background: #f3f4ff;
+}
+
+.tree-row-badge {
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+}
+
+.tree-row-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-row-id {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tree-row-sub {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.tree-row-chip {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  margin-left: 4px;
+}
+
+.tree-row-delete {
+  font-size: 14px;
+  color: #9ca3af;
+  padding: 0 4px;
+}
+
+.tree-row-delete:hover {
+  color: #ef4444;
+}
+
+/* 리스트 하단 버튼 */
+.tree-list-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.tree-list-footer button {
+  flex: 1;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  padding: 4px 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.tree-list-footer button:hover {
+  background: #e5e7eb;
+}
+
+#addModeHint {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #f97316;
+}
+
+/* ===== Leaflet 팝업 스타일 ===== */
+.lsms-tree-popup .leaflet-popup-content {
+  margin: 0;
+}
+.lsms-tree-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.32);
+}
+.lsms-tree-popup .leaflet-popup-tip {
+  border-top-color: #ffffff;
+}
+
+.lsms-popup {
+  min-width: 260px;
+  max-width: 280px;
+  font-size: 11px;
+  color: #111827;
+}
+
+.lsms-popup-header {
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #f9fafb, #eef2ff);
+}
+
+.lsms-popup-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.lsms-popup-sub {
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.lsms-popup-body {
+  padding: 8px 10px 10px;
+}
+
+.lsms-tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.lsms-tab-btn {
+  border: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  background: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+.lsms-tab-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.lsms-tab-panel {
+  display: none;
+}
+
+.lsms-tab-panel.active {
+  display: block;
+}
+
+.lsms-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  margin: 4px 0 4px;
+}
+
+.lsms-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.lsms-row span:first-child {
+  color: #6b7280;
+}
+
+.lsms-note {
+  margin-top: 4px;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.lsms-photo {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  border: 1px solid #e5e7eb;
+  object-fit: cover;
+}
