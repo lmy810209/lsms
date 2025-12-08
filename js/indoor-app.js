@@ -42,7 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ---------------------- 공통: 데이터 로드 ----------------------
 async function loadIndoorData() {
-  const res = await fetch("./data/indoor-data.json");
+  // indoor/index.html 기준으로 한 단계 올라가서 /data 폴더 접근
+  const res = await fetch("../data/indoor-data.json");
   if (!res.ok) throw new Error("indoor-data.json 불러오기 실패");
   return await res.json();
 }
