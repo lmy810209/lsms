@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>LSMS INDOOR · 사진 관리</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="../css/outdoor-style.css" />
+  <script src="../js/indoor-photos.js" defer></script>
+</head>
+<body>
+  <!-- 사이드바 (photos만 active) -->
+  <aside class="sidebar">
+    <div class="side-header">
+      <div class="side-logo">LS</div>
+      <div class="side-title">
+        <div class="side-title-main">LSMS INDOOR</div>
+        <div class="side-title-sub">Hyundai · Yangjae HQ</div>
+      </div>
+    </div>
+
+    <div class="side-section-label">MAIN</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a href="index.html" class="nav-link">
+          <div class="nav-icon-round">📊</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">실내조경 대시보드</span>
+            <span class="nav-label-sub">조경 상태 · 작업 · 급수 요약</span>
+          </div>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="schedule.html" class="nav-link">
+          <div class="nav-icon-round">🗂️</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">작업 스케줄</span>
+            <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
+          </div>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="plants.html" class="nav-link">
+          <div class="nav-icon-round">🌿</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">식물 관리</span>
+            <span class="nav-label-sub">층별/구역별 식물 현황</span>
+          </div>
+        </a>
+      </li>
+      <li class="nav-item active">
+        <a href="photos.html" class="nav-link">
+          <div class="nav-icon-round">📷</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">사진 관리</span>
+            <span class="nav-label-sub">전/후 기록 및 점검</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <div class="side-section-label">DATA</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <div class="nav-icon-round">💧</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">급수 기록</span>
+          <span class="nav-label-sub">구역/식물별 급수량 데이터</span>
+        </div>
+      </li>
+      <li class="nav-item">
+        <div class="nav-icon-round">📡</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">실내 센서</span>
+          <span class="nav-label-sub">조도 · 온습도 · 토양 수분</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="side-footer">
+      <div class="side-footer-top">LMY · Site Manager</div>
+      <div>v0.4 INDOOR</div>
+    </div>
+  </aside>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <main class="main">
+    <header class="main-header">
+      <div class="main-header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        <div>
+          <div class="main-title">사진 관리 · LSMS INDOOR</div>
+          <div class="main-subtitle">
+            플랜터별 전/후 사진과 작업 이력을 한 번에 확인합니다. (업로드 기능은 추후 연동)
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="layout-grid">
+      <div class="left-main">
+        <section class="top-grid">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">사진 기록 목록</div>
+                <div class="card-sub" id="photoSummary">
+                  플랜터별 전/후 사진 세트를 보여줍니다.
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-grid" id="photoList" style="margin-top:8px;">
+              <!-- JS로 카드 생성 -->
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <aside class="right-panel">
+        <article class="card">
+          <div class="weather-card-header">
+            <div>
+              <div class="weather-title" id="photoDetailTitle">선택된 사진 세트</div>
+              <div class="weather-sub" id="photoDetailSub">
+                왼쪽에서 사진 카드를 선택하면 확대 정보가 표시됩니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="weather-today" style="align-items:flex-start;">
+            <div id="photoDetailBody" class="weather-today-meta">
+              · 플랜터/구역 정보<br>
+              · 촬영 일자<br>
+              · 전/후 사진 링크<br>
+              · 관련 작업(교체/정비/민원 등) 메모<br>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
