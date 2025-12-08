@@ -5,11 +5,15 @@
   <title>LSMS INDOOR · 식물 관리</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- 공통 CSS -->
   <link rel="stylesheet" href="../css/outdoor-style.css" />
-  <script src="../js/indoor-plants.js" defer></script>
+
+  <!-- 식물 관리 전용 스크립트 (같은 폴더 plants.js) -->
+  <script src="./plants.js" defer></script>
 </head>
 <body>
-  <!-- 사이드바 (plants만 active) -->
+
+  <!-- ========== 사이드바 (plants만 active) ========== -->
   <aside class="sidebar">
     <div class="side-header">
       <div class="side-logo">LS</div>
@@ -30,6 +34,7 @@
           </div>
         </a>
       </li>
+
       <li class="nav-item">
         <a href="schedule.html" class="nav-link">
           <div class="nav-icon-round">🗂️</div>
@@ -39,6 +44,7 @@
           </div>
         </a>
       </li>
+
       <li class="nav-item active">
         <a href="plants.html" class="nav-link">
           <div class="nav-icon-round">🌿</div>
@@ -48,6 +54,7 @@
           </div>
         </a>
       </li>
+
       <li class="nav-item">
         <a href="photos.html" class="nav-link">
           <div class="nav-icon-round">📷</div>
@@ -85,6 +92,7 @@
 
   <div class="mobile-overlay" id="mobileOverlay"></div>
 
+  <!-- ========== 메인 영역 ========== -->
   <main class="main">
     <header class="main-header">
       <div class="main-header-left">
@@ -92,49 +100,88 @@
         <div>
           <div class="main-title">식물 관리 · LSMS INDOOR</div>
           <div class="main-subtitle">
-            층/구역/플랜터별 식재 현황과 건강 상태를 한 화면에서 관리합니다.
+            건물 · 층 · 구역 · 플랜터 기준으로 실내 식물 현황과 상태를 정리해서 보여주는 화면입니다.
           </div>
         </div>
       </div>
     </header>
 
+    <!-- 상단 필터 3개 -->
+    <section class="bottom-grid">
+      <article class="card">
+        <div class="card-title">건물</div>
+        <div class="metric-sub">서관 · 동관 · 아트리움 기준 선택</div>
+        <div id="buildingFilter" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-title">층</div>
+        <div class="metric-sub">선택한 건물 기준 주요 관리 층</div>
+        <div id="floorFilter" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-title">구역/존</div>
+        <div class="metric-sub">라운지 · 회의실 존 · 카페테리아 존 등</div>
+        <div id="zoneFilter" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+      </article>
+    </section>
+
+    <!-- 본문: 좌측 목록 / 우측 상세 -->
     <section class="layout-grid">
+      <!-- 왼쪽 -->
       <div class="left-main">
         <section class="top-grid">
+          <!-- 플랜터 목록 -->
           <article class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">층·구역별 식물 요약</div>
-                <div class="card-sub" id="plantSummary">
-                  실내 전체 식물 개체 수 및 구역별 분포입니다.
+                <div class="card-title">플랜터 목록</div>
+                <div class="card-sub" id="planterListSummary">
+                  필터에 맞는 플랜터가 표시됩니다.
                 </div>
               </div>
             </div>
+            <div class="weather-forecast-list" id="planterList" style="max-height:420px; overflow-y:auto;">
+              <!-- JS로 행 삽입 -->
+            </div>
+          </article>
 
-            <div class="weather-forecast-list" id="plantZoneList" style="max-height:520px; overflow-y:auto;">
-              <!-- JS로 채움 -->
+          <!-- 식물 종 요약 -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">식물 종 요약</div>
+                <div class="card-sub" id="speciesSummary">
+                  현재 필터 조건에 해당하는 식물 종·개체 수입니다.
+                </div>
+              </div>
+            </div>
+            <div class="weather-forecast-list" id="speciesList" style="max-height:420px; overflow-y:auto;">
+              <!-- JS로 삽입 -->
             </div>
           </article>
         </section>
       </div>
 
+      <!-- 오른쪽: 플랜터 상세 -->
       <aside class="right-panel">
         <article class="card">
           <div class="weather-card-header">
             <div>
-              <div class="weather-title" id="plantDetailTitle">플랜터 상세</div>
-              <div class="weather-sub" id="plantDetailSub">
-                왼쪽에서 구역이나 플랜터를 선택하면 상세 식재 정보가 표시됩니다.
+              <div class="weather-title" id="planterDetailTitle">플랜터 상세</div>
+              <div class="weather-sub" id="planterDetailSub">
+                왼쪽 목록에서 플랜터를 클릭하면 상세 정보가 표시됩니다.
               </div>
             </div>
           </div>
 
           <div class="weather-today" style="align-items:flex-start;">
-            <div id="plantDetailBody" class="weather-today-meta">
-              · 플랜터 이름<br>
+            <div id="planterDetailBody" class="weather-today-meta">
               · 위치(건물/층/구역)<br>
-              · 식재 수종 및 개체 수<br>
-              · 건강 상태(양호/주의/불량)<br>
+              · 식재 종/개체수<br>
+              · 건강도 상태<br>
+              · 최근 작업/급수 이력(추가 예정)<br>
             </div>
           </div>
         </article>
