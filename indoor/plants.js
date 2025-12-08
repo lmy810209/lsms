@@ -1,3 +1,11 @@
+// 로그인/권한 확인
+const user = requireLogin("indoor/plants");
+const adminMode = isAdmin(user);
+
+// 관리자가 아니면 .admin-only 요소 숨기기
+if (!adminMode) {
+  document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
+}
 // plants.js – 실내 식물 관리 화면
 
 document.addEventListener("DOMContentLoaded", () => {
