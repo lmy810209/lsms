@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>LSMS INDOOR · 작업 스케줄</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="../css/outdoor-style.css" />
+  <script src="../js/indoor-schedule.js" defer></script>
+</head>
+<body>
+
+  <!-- 사이드바 (schedule만 active) -->
+  <aside class="sidebar">
+    <div class="side-header">
+      <div class="side-logo">LS</div>
+      <div class="side-title">
+        <div class="side-title-main">LSMS INDOOR</div>
+        <div class="side-title-sub">Hyundai · Yangjae HQ</div>
+      </div>
+    </div>
+
+    <div class="side-section-label">MAIN</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a href="index.html" class="nav-link">
+          <div class="nav-icon-round">📊</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">실내조경 대시보드</span>
+            <span class="nav-label-sub">조경 상태 · 작업 · 급수 요약</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="nav-item active">
+        <a href="schedule.html" class="nav-link">
+          <div class="nav-icon-round">🗂️</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">작업 스케줄</span>
+            <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="plants.html" class="nav-link">
+          <div class="nav-icon-round">🌿</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">식물 관리</span>
+            <span class="nav-label-sub">층별/구역별 식물 현황</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="photos.html" class="nav-link">
+          <div class="nav-icon-round">📷</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">사진 관리</span>
+            <span class="nav-label-sub">전/후 기록 및 점검</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <div class="side-section-label">DATA</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <div class="nav-icon-round">💧</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">급수 기록</span>
+          <span class="nav-label-sub">구역/식물별 급수량 데이터</span>
+        </div>
+      </li>
+      <li class="nav-item">
+        <div class="nav-icon-round">📡</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">실내 센서</span>
+          <span class="nav-label-sub">조도 · 온습도 · 토양 수분</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="side-footer">
+      <div class="side-footer-top">LMY · Site Manager</div>
+      <div>v0.4 INDOOR</div>
+    </div>
+  </aside>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <!-- 메인 -->
+  <main class="main">
+    <header class="main-header">
+      <div class="main-header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        <div>
+          <div class="main-title">작업 스케줄 · LSMS INDOOR</div>
+          <div class="main-subtitle">
+            관수·잎닦기·정비·방제 등 실내조경 작업 일정을 일/주 단위로 관리합니다.
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 상단 필터 -->
+    <section class="bottom-grid">
+      <article class="card">
+        <div class="card-title">기간 필터</div>
+        <div class="metric-sub">표시할 작업 기간을 선택하세요.</div>
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="metric-badge-ok" data-range="today">오늘</button>
+          <button class="metric-badge-ok" data-range="week">이번 주</button>
+          <button class="metric-badge-ok" data-range="all">전체</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-title">작업 유형</div>
+        <div class="metric-sub">관수·정비·방제 등으로 필터링</div>
+        <div id="taskTypeFilter" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+      </article>
+
+      <article class="card">
+        <div class="card-title">작업자</div>
+        <div class="metric-sub">담당 작업자 기준으로 보기</div>
+        <div id="workerFilter" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+      </article>
+    </section>
+
+    <!-- 작업 리스트 -->
+    <section class="layout-grid">
+      <div class="left-main">
+        <section class="top-grid">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">작업 목록</div>
+                <div class="card-sub" id="taskListSummary">
+                  필터에 맞는 작업이 표시됩니다.
+                </div>
+              </div>
+            </div>
+
+            <div class="weather-forecast-list" id="taskList" style="max-height:520px; overflow-y:auto;">
+              <!-- JS로 작업 행 삽입 -->
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <!-- 오른쪽: 선택된 작업 상세 -->
+      <aside class="right-panel">
+        <article class="card">
+          <div class="weather-card-header">
+            <div>
+              <div class="weather-title" id="taskDetailTitle">작업 상세</div>
+              <div class="weather-sub" id="taskDetailSub">
+                왼쪽 목록에서 작업을 클릭하면 상세 정보가 표시됩니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="weather-today" style="align-items:flex-start;">
+            <div id="taskDetailBody" class="weather-today-meta">
+              · 작업 유형<br>
+              · 대상 플랜터/구역<br>
+              · 담당자<br>
+              · 예정일/완료일<br>
+              · 상태(완료/미완료)<br>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
