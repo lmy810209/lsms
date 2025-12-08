@@ -1,61 +1,42 @@
 {
   "buildings": [
-    {
-      "id": "west",
-      "name": "서관",
-      "floors": [1, 3, 18]
-    },
-    {
-      "id": "east",
-      "name": "동관",
-      "floors": [3]
-    },
-    {
-      "id": "atrium",
-      "name": "아트리움",
-      "floors": [1]
-    }
+    { "id": "west", "name": "서관", "floors": [1, 3, 18] },
+    { "id": "east", "name": "동관", "floors": [3] },
+    { "id": "atrium", "name": "아트리움", "floors": [1] }
   ],
-
   "zones": [
     { "id": "S18-L1", "building": "west", "floor": 18, "name": "라운지" },
     { "id": "S18-M1", "building": "west", "floor": 18, "name": "회의실 존" },
     { "id": "S01-LB", "building": "west", "floor": 1, "name": "메인 로비" },
     { "id": "E03-CF", "building": "east", "floor": 3, "name": "카페테리아 존" }
   ],
-
   "planters": [
     { "id": "P-S18-01", "zone": "S18-L1", "name": "라운지 메인 플랜터" },
     { "id": "P-S18-02", "zone": "S18-M1", "name": "회의실 앞 플랜터" },
     { "id": "P-S01-01", "zone": "S01-LB", "name": "로비 중앙 플랜터" },
     { "id": "P-E03-01", "zone": "E03-CF", "name": "카페 앞 플랜터" }
   ],
-
   "plants": [
     { "id": "plant01", "planter": "P-S18-01", "species": "관음죽", "count": 3, "health": "good" },
     { "id": "plant02", "planter": "P-S18-02", "species": "마지나타", "count": 2, "health": "warn" },
     { "id": "plant03", "planter": "P-S01-01", "species": "드라세나 콤팩타", "count": 5, "health": "good" },
     { "id": "plant04", "planter": "P-E03-01", "species": "홍콩야자", "count": 4, "health": "good" }
   ],
-
   "tasks": [
-    { "id": "T01", "date": "2025-12-08", "type": "관수", "planter": "P-S18-02", "status": "pending", "worker": "이문엽" },
+    { "id": "T01", "date": "2025-12-08", "type": "관수",   "planter": "P-S18-02", "status": "pending",   "worker": "이문엽" },
     { "id": "T02", "date": "2025-12-08", "type": "잎닦기", "planter": "P-S01-01", "status": "completed", "worker": "김명규" },
-    { "id": "T03", "date": "2025-12-07", "type": "정비", "planter": "P-S18-01", "status": "pending", "worker": "이문엽" },
-    { "id": "T04", "date": "2025-12-06", "type": "방제", "planter": "P-E03-01", "status": "completed", "worker": "김명규" }
+    { "id": "T03", "date": "2025-12-07", "type": "정비",   "planter": "P-S18-01", "status": "pending",   "worker": "이문엽" },
+    { "id": "T04", "date": "2025-12-06", "type": "방제",   "planter": "P-E03-01", "status": "completed", "worker": "김명규" }
   ],
-
   "watering": [
     { "id": "W01", "date": "2025-12-08", "planter": "P-S18-01", "volume": 1.5, "worker": "이문엽" },
     { "id": "W02", "date": "2025-12-07", "planter": "P-S01-01", "volume": 2.0, "worker": "김명규" }
   ],
-
   "workers": [
     { "name": "이문엽", "last_work": "2025-12-08" },
     { "name": "김명규", "last_work": "2025-12-08" },
     { "name": "김XX",  "last_work": "2025-12-05" }
   ],
-
   "photos": [
     { "id": "PH01", "date": "2025-12-07", "planter": "P-S18-01", "type": "before", "url": "/photos/p1_before.jpg" },
     { "id": "PH02", "date": "2025-12-07", "planter": "P-S18-01", "type": "after",  "url": "/photos/p1_after.jpg" }
