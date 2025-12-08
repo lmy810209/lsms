@@ -4,3 +4,14 @@
 @import url("./outdoor-layout.css");
 @import url("./outdoor-components.css");
 @import url("./outdoor-mobile.css");
+
+/* === INDOOR/OUTDOOR 공통 사이드바 링크 스타일 === */
+.sidebar .nav-link {
+  display: block;
+  text-decoration: none;   /* 밑줄 제거 */
+  color: inherit;          /* 부모(.nav-item)의 글자색 그대로 */
+}
+
+.sidebar .nav-link:visited {
+  color: inherit;          /* 방문한 링크도 같은 색 */
+}
