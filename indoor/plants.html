@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>LSMS INDOOR · 식물 관리</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="../css/outdoor-style.css" />
+  <script src="../js/indoor-plants.js" defer></script>
+</head>
+<body>
+  <!-- 사이드바 (plants만 active) -->
+  <aside class="sidebar">
+    <div class="side-header">
+      <div class="side-logo">LS</div>
+      <div class="side-title">
+        <div class="side-title-main">LSMS INDOOR</div>
+        <div class="side-title-sub">Hyundai · Yangjae HQ</div>
+      </div>
+    </div>
+
+    <div class="side-section-label">MAIN</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a href="index.html" class="nav-link">
+          <div class="nav-icon-round">📊</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">실내조경 대시보드</span>
+            <span class="nav-label-sub">조경 상태 · 작업 · 급수 요약</span>
+          </div>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="schedule.html" class="nav-link">
+          <div class="nav-icon-round">🗂️</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">작업 스케줄</span>
+            <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
+          </div>
+        </a>
+      </li>
+      <li class="nav-item active">
+        <a href="plants.html" class="nav-link">
+          <div class="nav-icon-round">🌿</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">식물 관리</span>
+            <span class="nav-label-sub">층별/구역별 식물 현황</span>
+          </div>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="photos.html" class="nav-link">
+          <div class="nav-icon-round">📷</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">사진 관리</span>
+            <span class="nav-label-sub">전/후 기록 및 점검</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <div class="side-section-label">DATA</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <div class="nav-icon-round">💧</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">급수 기록</span>
+          <span class="nav-label-sub">구역/식물별 급수량 데이터</span>
+        </div>
+      </li>
+      <li class="nav-item">
+        <div class="nav-icon-round">📡</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">실내 센서</span>
+          <span class="nav-label-sub">조도 · 온습도 · 토양 수분</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="side-footer">
+      <div class="side-footer-top">LMY · Site Manager</div>
+      <div>v0.4 INDOOR</div>
+    </div>
+  </aside>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <main class="main">
+    <header class="main-header">
+      <div class="main-header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        <div>
+          <div class="main-title">식물 관리 · LSMS INDOOR</div>
+          <div class="main-subtitle">
+            층/구역/플랜터별 식재 현황과 건강 상태를 한 화면에서 관리합니다.
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="layout-grid">
+      <div class="left-main">
+        <section class="top-grid">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">층·구역별 식물 요약</div>
+                <div class="card-sub" id="plantSummary">
+                  실내 전체 식물 개체 수 및 구역별 분포입니다.
+                </div>
+              </div>
+            </div>
+
+            <div class="weather-forecast-list" id="plantZoneList" style="max-height:520px; overflow-y:auto;">
+              <!-- JS로 채움 -->
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <aside class="right-panel">
+        <article class="card">
+          <div class="weather-card-header">
+            <div>
+              <div class="weather-title" id="plantDetailTitle">플랜터 상세</div>
+              <div class="weather-sub" id="plantDetailSub">
+                왼쪽에서 구역이나 플랜터를 선택하면 상세 식재 정보가 표시됩니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="weather-today" style="align-items:flex-start;">
+            <div id="plantDetailBody" class="weather-today-meta">
+              · 플랜터 이름<br>
+              · 위치(건물/층/구역)<br>
+              · 식재 수종 및 개체 수<br>
+              · 건강 상태(양호/주의/불량)<br>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
