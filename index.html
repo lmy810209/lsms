@@ -113,6 +113,10 @@
       background: var(--accent-soft);
     }
 
+    .portal-radio input {
+      accent-color: var(--accent);
+    }
+
     /* button */
     .portal-button {
       width: 100%; padding: 12px 0;
@@ -189,23 +193,17 @@
 
   <script>
     function handleLogin() {
-      const site = document.getElementById('site').value;
+      const site  = document.getElementById('site').value;
       const scope = document.querySelector('input[name="scope"]:checked').value;
-      const id = document.getElementById('userId').value.trim();
-      const pw = document.getElementById('userPw').value.trim();
+      const id    = document.getElementById('userId').value.trim();
+      const pw    = document.getElementById('userPw').value.trim();
 
       // 데모 계정
-      const isAdmin = id === "admin" && pw === "1234";
+      const isAdmin  = id === "admin"  && pw === "1234";
       const isWorker = id === "worker" && pw === "1234";
 
       if (!isAdmin && !isWorker) {
         alert("아이디 또는 비밀번호가 올바르지 않습니다.");
-        return;
-      }
-
-      // 실내조경은 아직 없음
-      if (scope === "indoor") {
-        alert("실내조경 화면은 아직 준비중입니다.\n실외조경을 선택해 주세요.");
         return;
       }
 
@@ -218,20 +216,38 @@
         loggedAt: new Date().toISOString()
       }));
 
-      // 실외조경 라우팅
       let target = "";
 
-      if (site === "yangjae") {
-        target = "/outdoor/index.html";
-      } 
-      else if (site === "gangnam") {
-        target = "/outdoor/gangnam/index.html"; // 준비 예정
-      } 
-      else {
-        alert("해당 사업장은 아직 준비중입니다.");
-        return;
+      /* =========================
+         🏢 실내조경 라우팅
+      ========================== */
+      if (scope === "indoor") {
+        if (site === "yangjae") {
+          target = "/indoor/index.html";        // 양재 HQ 실내조경
+        } else if (site === "gangnam") {
+          // 강남 실내조경 페이지 따로 만들면 여기 경로만 바꾸면 됨
+          target = "/indoor/index.html";
+        } else {
+          alert("해당 사업장의 실내조경 화면이 준비되지 않았습니다.");
+          return;
+        }
       }
 
+      /* =========================
+         🌳 실외조경 라우팅
+      ========================== */
+      if (scope === "outdoor") {
+        if (site === "yangjae") {
+          target = "/outdoor/index.html";
+        } else if (site === "gangnam") {
+          target = "/outdoor/gangnam/index.html"; // 준비 예정
+        } else {
+          alert("해당 사업장의 실외조경 화면이 준비되지 않았습니다.");
+          return;
+        }
+      }
+
+      // 최종 이동
       window.location.href = target;
     }
   </script>
