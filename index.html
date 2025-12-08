@@ -5,9 +5,6 @@
   <title>LSMS Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- 공통 스타일 -->
-  <link rel="stylesheet" href="../css/style.css">
-
   <style>
     :root {
       --bg: #f3f4f6;
@@ -16,9 +13,11 @@
       --text-main: #0f172a;
       --text-sub: #6b7280;
       --accent: #2563eb;
+      --accent-soft: #e0edff;
     }
 
-    /* 전체 레이아웃 */
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -26,211 +25,161 @@
       align-items: center;
       justify-content: center;
       background: var(--bg);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+      font-family: "Pretendard", system-ui, sans-serif;
       color: var(--text-main);
     }
 
+    /* 카드 */
     .portal-card {
       width: 100%;
       max-width: 420px;
       margin: 16px;
       background: var(--card-bg);
       border-radius: 22px;
-      padding: 22px 20px 18px;
-      box-shadow:
-        0 18px 40px rgba(15, 23, 42, 0.16),
-        0 0 0 1px rgba(148, 163, 184, 0.18);
+      padding: 24px 22px 20px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+      border: 1px solid rgba(148,163,184,0.18);
     }
 
-    /* 헤더 */
+    /* header */
     .portal-header {
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .portal-logo {
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
       background: #111827;
-      display: inline-flex;
-      align-items: center;
+      display: flex;
       justify-content: center;
-      color: #f9fafb;
-      font-size: 11px;
+      align-items: center;
+      color: #fff;
+      font-size: 12px;
       font-weight: 700;
     }
 
-    .portal-title-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+    .portal-title { font-size: 17px; font-weight: 600; }
+    .portal-sub { font-size: 12px; color: var(--text-sub); }
+
+    .section-title {
+      font-size: 11px; font-weight: 600;
+      color: #4b5563; margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.08em;
     }
 
-    .portal-title {
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-    }
-
-    .portal-sub {
-      font-size: 11px;
-      color: var(--text-sub);
-    }
-
-    .portal-section-title {
-      font-size: 11px;
-      font-weight: 600;
-      color: #4b5563;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
-
-    .portal-select,
-    .portal-input {
-      width: 100%;
-      margin-bottom: 12px;
-    }
-
+    /* select / input */
     .portal-select select,
     .portal-input input {
       width: 100%;
-      padding: 9px 11px;
-      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border-radius: 12px;
       border: 1px solid #d1d5db;
-      background: #ffffff;
-      font-size: 13px;
-      color: var(--text-main);
       outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: white;
+      transition: 0.15s ease;
     }
 
     .portal-select select:focus,
     .portal-input input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.25);
     }
 
+    .portal-select,
+    .portal-input { margin-bottom: 14px; }
+
+    /* radio */
     .portal-radio-group {
-      width: 100%;
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      display: flex; gap: 8px; margin-bottom: 14px;
     }
 
     .portal-radio {
       flex: 1;
-      border-radius: 11px;
+      padding: 8px 12px;
+      border-radius: 12px;
       border: 1px solid #d1d5db;
-      background: #ffffff;
-      padding: 7px 9px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      color: #111827;
-      transition: border-color 0.15s ease, background 0.15s ease;
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer; transition: 0.15s ease;
+      background: white;
     }
 
     .portal-radio:hover {
       border-color: var(--accent);
-      background: #eff6ff;
+      background: var(--accent-soft);
     }
 
-    .portal-radio input {
-      accent-color: var(--accent);
-    }
-
+    /* button */
     .portal-button {
-      width: 100%;
-      margin-top: 4px;
-      padding: 10px 0;
-      border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, #2563eb, #38bdf8);
-      color: #f9fafb;
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 0.03em;
+      width: 100%; padding: 12px 0;
+      background: linear-gradient(135deg,#2563eb,#38bdf8);
+      border-radius: 999px; color: white;
+      font-weight: 600; border: none;
       cursor: pointer;
-      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.1s ease;
+      box-shadow: 0 10px 24px rgba(37,99,235,0.30);
+      transition: 0.1s ease;
+      font-size: 15px;
     }
 
     .portal-button:active {
       transform: translateY(1px);
-      box-shadow: 0 5px 10px rgba(37, 99, 235, 0.3);
-      opacity: 0.93;
+      box-shadow: 0 5px 12px rgba(37,99,235,0.25);
     }
 
     .portal-footer {
       margin-top: 10px;
       font-size: 11px;
-      color: #9ca3af;
+      color: var(--text-sub);
       text-align: right;
-    }
-
-    @media (max-width: 480px) {
-      .portal-card {
-        margin: 12px;
-        padding: 20px 18px 16px;
-        border-radius: 18px;
-      }
     }
   </style>
 </head>
+
 <body>
+
   <div class="portal-card">
     <div class="portal-header">
       <div class="portal-logo">LS</div>
-      <div class="portal-title-wrap">
+      <div>
         <div class="portal-title">LSMS Portal</div>
         <div class="portal-sub">사업장 / 실내·실외 선택 후 로그인</div>
       </div>
     </div>
 
     <!-- 사업장 -->
-    <div>
-      <div class="portal-section-title">사업장</div>
-      <div class="portal-select">
-        <select id="site">
-          <option value="yangjae">양재 HQ</option>
-          <option value="gangnam">강남사옥</option>
-          <option value="future">미래 사업장 (준비중)</option>
-        </select>
-      </div>
+    <div class="section-title">사업장</div>
+    <div class="portal-select">
+      <select id="site">
+        <option value="yangjae">양재 HQ</option>
+        <option value="gangnam">강남사옥</option>
+        <option value="future">미래 사업장(준비중)</option>
+      </select>
     </div>
 
     <!-- 구역 -->
-    <div>
-      <div class="portal-section-title">구역</div>
-      <div class="portal-radio-group">
-        <label class="portal-radio">
-          <input type="radio" name="scope" value="indoor" checked />
-          <span>실내조경</span>
-        </label>
-        <label class="portal-radio">
-          <input type="radio" name="scope" value="outdoor" />
-          <span>실외조경</span>
-        </label>
-      </div>
+    <div class="section-title">구역</div>
+    <div class="portal-radio-group">
+      <label class="portal-radio">
+        <input type="radio" name="scope" value="indoor" checked />
+        <span>실내조경</span>
+      </label>
+      <label class="portal-radio">
+        <input type="radio" name="scope" value="outdoor" />
+        <span>실외조경</span>
+      </label>
     </div>
 
-    <!-- 로그인 -->
-    <div>
-      <div class="portal-section-title">계정</div>
-      <div class="portal-input">
-        <input type="text" id="userId" placeholder="아이디" />
-      </div>
-      <div class="portal-input">
-        <input type="password" id="userPw" placeholder="비밀번호" />
-      </div>
+    <!-- 계정 -->
+    <div class="section-title">계정</div>
+    <div class="portal-input">
+      <input type="text" id="userId" placeholder="아이디" />
+    </div>
+    <div class="portal-input">
+      <input type="password" id="userPw" placeholder="비밀번호" />
     </div>
 
     <button class="portal-button" onclick="handleLogin()">접속하기</button>
@@ -239,33 +188,53 @@
   </div>
 
   <script>
-    // 사업장 + 실내/실외 조합에 따라 페이지 라우팅만 처리
     function handleLogin() {
       const site = document.getElementById('site').value;
       const scope = document.querySelector('input[name="scope"]:checked').value;
+      const id = document.getElementById('userId').value.trim();
+      const pw = document.getElementById('userPw').value.trim();
 
-      // 아직 실내조경 화면은 없음 → 안내만 하고 끝
-      if (scope === 'indoor') {
-        alert('실내조경 화면은 아직 준비중입니다.\n실외조경을 선택해 주세요.');
+      // 데모 계정
+      const isAdmin = id === "admin" && pw === "1234";
+      const isWorker = id === "worker" && pw === "1234";
+
+      if (!isAdmin && !isWorker) {
+        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
         return;
       }
 
-      // 여기까지 왔으면 scope === 'outdoor'
-      let target = '';
-
-      if (site === 'yangjae') {
-        target = '/outdoor/index.html';            // 양재 실외
-      } else if (site === 'gangnam') {
-        target = '/outdoor/gangnam/index.html';    // 나중에 만들 강남 실외
-      } else {
-        alert('해당 사업장은 아직 준비중입니다.');
+      // 실내조경은 아직 없음
+      if (scope === "indoor") {
+        alert("실내조경 화면은 아직 준비중입니다.\n실외조경을 선택해 주세요.");
         return;
       }
 
-      console.log('move to:', target);
+      // 로그인 정보 저장
+      localStorage.setItem("lsmsUser", JSON.stringify({
+        id,
+        role: isAdmin ? "admin" : "worker",
+        site,
+        scope,
+        loggedAt: new Date().toISOString()
+      }));
+
+      // 실외조경 라우팅
+      let target = "";
+
+      if (site === "yangjae") {
+        target = "/outdoor/index.html";
+      } 
+      else if (site === "gangnam") {
+        target = "/outdoor/gangnam/index.html"; // 준비 예정
+      } 
+      else {
+        alert("해당 사업장은 아직 준비중입니다.");
+        return;
+      }
+
       window.location.href = target;
     }
   </script>
+
 </body>
 </html>
-
