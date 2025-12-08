@@ -49,15 +49,15 @@
         </a>
       </li>
 
-  <li class="nav-item">
-    <a href="schedule.html" class="nav-link">
-      <div class="nav-icon-round">🗂️</div>
-      <div class="nav-label-wrap">
-        <span class="nav-label-main">작업 스케줄</span>
-        <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
-      </div>
-    </a>
-  </li>
+      <li class="nav-item">
+        <a href="schedule.html" class="nav-link">
+          <div class="nav-icon-round">🗂️</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">작업 스케줄</span>
+            <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
+          </div>
+        </a>
+      </li>
 
       <li class="nav-item">
         <a href="plants.html" class="nav-link">
@@ -125,15 +125,17 @@
         </div>
       </div>
 
-<div class="status-badges">
-  <div class="status-pill">
-    <span class="status-dot"></span>
-    <span id="lsmsUserLabel">로그인 정보 없음</span>
-  </div>
-  <div class="status-site" id="lsmsSiteLabel">현장: -</div>
-  <button class="status-logout-btn" id="lsmsLogoutBtn">로그아웃</button>
-</div>
-
+      <!-- 🔐 로그인 상태 · 현장 표시 · 로그아웃 -->
+      <div class="status-badges">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span id="loginStatus">로그인 정보 없음</span>
+        </div>
+        <div class="status-site">
+          현장: <span id="currentSite">-</span>
+          <button class="status-logout-btn" id="logoutBtn">로그아웃</button>
+        </div>
+      </div>
     </header>
 
     <!-- 요약 카드 4개 -->
