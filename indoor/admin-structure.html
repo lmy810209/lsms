@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>LSMS INDOOR · 구조 관리(관리자)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- 공통 CSS -->
+  <link rel="stylesheet" href="../css/outdoor-style.css" />
+
+  <!-- 관리자 전용 JS -->
+  <script src="../js/indoor-admin-structure.js" defer></script>
+</head>
+<body>
+
+  <!-- ========== 사이드바 ========== -->
+  <aside class="sidebar">
+    <div class="side-header">
+      <div class="side-logo">LS</div>
+      <div class="side-title">
+        <div class="side-title-main">LSMS INDOOR</div>
+        <div class="side-title-sub">Hyundai · Yangjae HQ</div>
+      </div>
+    </div>
+
+    <div class="side-section-label">MAIN</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a href="index.html" class="nav-link">
+          <div class="nav-icon-round">📊</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">실내조경 대시보드</span>
+            <span class="nav-label-sub">조경 상태 · 작업 · 급수 요약</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="schedule.html" class="nav-link">
+          <div class="nav-icon-round">🗂️</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">작업 스케줄</span>
+            <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="plants.html" class="nav-link">
+          <div class="nav-icon-round">🌿</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">식물 관리</span>
+            <span class="nav-label-sub">층별/구역별 식물 현황</span>
+          </div>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a href="photos.html" class="nav-link">
+          <div class="nav-icon-round">📷</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">사진 관리</span>
+            <span class="nav-label-sub">전/후 기록 및 점검</span>
+          </div>
+        </a>
+      </li>
+
+      <!-- 관리자 메뉴 -->
+      <li class="nav-item active">
+        <a href="admin-structure.html" class="nav-link">
+          <div class="nav-icon-round">🛠️</div>
+          <div class="nav-label-wrap">
+            <span class="nav-label-main">구조 관리(관리자)</span>
+            <span class="nav-label-sub">건물 · 층 · 구역 · 플랜터 정의</span>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <div class="side-section-label">DATA</div>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <div class="nav-icon-round">💧</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">급수 기록</span>
+          <span class="nav-label-sub">구역/식물별 급수량 데이터</span>
+        </div>
+      </li>
+      <li class="nav-item">
+        <div class="nav-icon-round">📡</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">실내 센서</span>
+          <span class="nav-label-sub">조도 · 온습도 · 토양 수분</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="side-footer">
+      <div class="side-footer-top">LMY · Site Manager</div>
+      <div>ADMIN · INDOOR STRUCTURE</div>
+    </div>
+  </aside>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <!-- ========== 메인 ========== -->
+  <main class="main">
+    <header class="main-header">
+      <div class="main-header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        <div>
+          <div class="main-title">실내 구조 관리 · 관리자 모드</div>
+          <div class="main-subtitle">
+            건물 · 층 · 구역(존) · 플랜터 구조를 수정한 뒤, JSON을 복사하여 indoor-data.json에 붙여넣는 용도의 설정 화면입니다.
+          </div>
+        </div>
+      </div>
+      <div class="status-badges">
+        <div class="status-pill">
+          <span class="status-dot"></span> 관리자 전용
+        </div>
+        <div class="status-site">로그인 계정: <span id="adminUserLabel">-</span></div>
+      </div>
+    </header>
+
+    <section class="layout-grid">
+      <div class="left-main">
+
+        <!-- 건물 + 층 정의 -->
+        <section class="bottom-grid">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">건물 정의</div>
+                <div class="card-sub">
+                  ID · 이름 · 관리 층 목록을 정의합니다. (예: floors: 1,3,18)
+                </div>
+              </div>
+              <button class="metric-badge-ok" id="addBuildingBtn">건물 추가</button>
+            </div>
+
+            <div class="weather-forecast-list" style="max-height:260px;overflow-y:auto;">
+              <table class="risk-table">
+                <thead>
+                  <tr>
+                    <th style="width:18%">ID</th>
+                    <th style="width:32%">건물 이름</th>
+                    <th style="width:32%">층 목록(쉼표 구분)</th>
+                    <th style="width:18%">삭제</th>
+                  </tr>
+                </thead>
+                <tbody id="buildingTableBody">
+                  <!-- JS 렌더링 -->
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <!-- 구역/존 정의 -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">구역 / 존 정의</div>
+                <div class="card-sub">
+                  건물·층별 관리 존을 정의합니다. (예: S18-L1 · 서관 · 18층 · 라운지 존)
+                </div>
+              </div>
+              <button class="metric-badge-ok" id="addZoneBtn">구역 추가</button>
+            </div>
+
+            <div class="weather-forecast-list" style="max-height:260px;overflow-y:auto;">
+              <table class="risk-table">
+                <thead>
+                  <tr>
+                    <th style="width:18%">ID</th>
+                    <th style="width:18%">건물ID</th>
+                    <th style="width:14%">층</th>
+                    <th style="width:40%">존 이름</th>
+                    <th style="width:10%">삭제</th>
+                  </tr>
+                </thead>
+                <tbody id="zoneTableBody">
+                  <!-- JS 렌더링 -->
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+
+        <!-- 플랜터 정의 -->
+        <section class="bottom-grid" style="margin-top:16px;">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">플랜터 정의</div>
+                <div class="card-sub">
+                  각 구역(존) 안의 플랜터 ID와 이름을 정의합니다. (예: P-S18-01 · 라운지 메인 플랜터)
+                </div>
+              </div>
+              <button class="metric-badge-ok" id="addPlanterBtn">플랜터 추가</button>
+            </div>
+
+            <div class="weather-forecast-list" style="max-height:260px;overflow-y:auto;">
+              <table class="risk-table">
+                <thead>
+                  <tr>
+                    <th style="width:18%">ID</th>
+                    <th style="width:22%">존 ID</th>
+                    <th style="width:50%">플랜터 이름</th>
+                    <th style="width:10%">삭제</th>
+                  </tr>
+                </thead>
+                <tbody id="planterTableBody">
+                  <!-- JS 렌더링 -->
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </section>
+      </div>
+
+      <!-- 오른쪽: JSON 미리보기 -->
+      <aside class="right-panel">
+        <article class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">indoor-data.json 미리보기</div>
+              <div class="card-sub">
+                아래 내용을 전체 선택 후 복사하여 /data/indoor-data.json 파일에 덮어쓰기 하면 구조가 반영됩니다.
+              </div>
+            </div>
+          </div>
+
+          <div class="weather-today" style="align-items:flex-start;">
+            <textarea
+              id="jsonPreview"
+              style="width:100%;height:420px;border-radius:10px;border:1px solid #e5e7eb;font-size:11px;font-family:Menlo,Consolas,monospace;padding:8px;resize:vertical;"
+            ></textarea>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+            <div class="weather-today-meta">
+              ※ 아직 서버 저장은 아니고, JSON 복사 → GitHub 또는 서버의 indoor-data.json에 붙여넣는 방식입니다.
+            </div>
+            <button class="metric-badge-ok" id="copyJsonBtn">JSON 전체 복사</button>
+          </div>
+        </article>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
