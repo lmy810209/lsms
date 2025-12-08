@@ -8,15 +8,19 @@
   <!-- 공통 CSS (실외 스타일 재사용) -->
   <link rel="stylesheet" href="../css/outdoor-style.css" />
 
-  <!-- Chart.js (실내 대시보드 그래프용) -->
+  <!-- 아이콘 폰트 (Material Symbols) -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- 실내 전용 JS -->
+  <!-- 실내 전용 스크립트 -->
   <script src="../js/indoor-app.js" defer></script>
 </head>
 
 <body>
-  <!-- ========== 사이드바 (실외 스타일 재사용) ========== -->
+
+  <!-- ========== 사이드바 ========== -->
   <aside class="sidebar">
     <div class="side-header">
       <div class="side-logo">LS</div>
@@ -32,28 +36,31 @@
         <div class="nav-icon-round">📊</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">실내조경 대시보드</span>
-          <span class="nav-label-sub">식물·작업·급수 현황 요약</span>
+          <span class="nav-label-sub">조경 상태 · 작업 · 급수 요약</span>
         </div>
       </li>
+
       <li class="nav-item">
-        <div class="nav-icon-round">🌱</div>
+        <div class="nav-icon-round">🌿</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">식물 관리</span>
-          <span class="nav-label-sub">층별·구역별 식물 현황</span>
+          <span class="nav-label-sub">층별/구역별 식물 현황</span>
         </div>
       </li>
+
       <li class="nav-item">
-        <div class="nav-icon-round">📅</div>
+        <div class="nav-icon-round">🗂️</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">작업 스케줄</span>
-          <span class="nav-label-sub">일정·반복 작업 관리</span>
+          <span class="nav-label-sub">관수 · 정비 · 방제 일정</span>
         </div>
       </li>
+
       <li class="nav-item">
         <div class="nav-icon-round">📄</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">리포트</span>
-          <span class="nav-label-sub">주간·월간 보고서</span>
+          <span class="nav-label-sub">주간 · 월간 보고서</span>
         </div>
       </li>
     </ul>
@@ -63,224 +70,225 @@
       <li class="nav-item">
         <div class="nav-icon-round">💧</div>
         <div class="nav-label-wrap">
-          <span class="nav-label-main">급수량 기록</span>
-          <span class="nav-label-sub">구역·식물별 관수 데이터</span>
+          <span class="nav-label-main">급수 기록</span>
+          <span class="nav-label-sub">구역/식물별 급수량 데이터</span>
         </div>
       </li>
+
       <li class="nav-item">
         <div class="nav-icon-round">📡</div>
         <div class="nav-label-wrap">
-          <span class="nav-label-main">실내 센서 데이터</span>
-          <span class="nav-label-sub">조도·온습도·토양 정보</span>
+          <span class="nav-label-main">실내 센서</span>
+          <span class="nav-label-sub">조도 · 온습도 · 토양 수분</span>
         </div>
       </li>
     </ul>
 
     <div class="side-footer">
       <div class="side-footer-top">LMY · Site Manager</div>
-      <div>v0.1 INDOOR SAMPLE · 양재 HQ</div>
+      <div>v0.3 INDOOR DASHBOARD</div>
     </div>
   </aside>
 
-  <!-- 모바일에서 사이드바 열렸을 때 배경 어둡게 -->
+  <!-- 모바일용 오버레이 -->
   <div class="mobile-overlay" id="mobileOverlay"></div>
 
-  <!-- ========== 메인 영역 ========== -->
+  <!-- ======================= 메인 영역 ======================= -->
   <main class="main">
 
-    <!-- 상단 제목 -->
+    <!-- 상단 헤더 -->
     <header class="main-header">
       <div class="main-header-left">
-        <!-- 모바일 전용 햄버거 버튼 -->
+        <!-- 모바일 햄버거 -->
         <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
 
         <div>
-          <div class="main-title">양재 HQ 실내조경 현황 · LSMS INDOOR</div>
+          <div class="main-title">양재 HQ 실내조경 대시보드</div>
           <div class="main-subtitle">
-            층별·구역별 실내 조경 상태와 작업·급수 데이터를 한 화면에서 확인하는 실내 조경 전용 대시보드입니다.
+            층/구역/식물 상태 · 작업 · 센서 정보를 한 화면에 통합한 실내조경 관리 시스템입니다.
           </div>
         </div>
       </div>
 
       <div class="status-badges">
         <div class="status-pill">
-          <span class="status-dot"></span>
-          실시간 모니터링 준비중
+          <span class="status-dot"></span> 준비 완료
         </div>
-        <div class="status-site">현장: 현대차 양재 본사 · 실내조경</div>
+        <div class="status-site">현장: 서관 · 동관 · 아트리움</div>
       </div>
     </header>
 
-    <!-- 상단 요약 카드 영역 -->
+    <!-- 요약 카드 4개 -->
     <section class="bottom-grid">
       <article class="card">
-        <div class="card-title">등록된 식물</div>
-        <div class="metric-main">1</div>
-        <div class="metric-sub">실내 조경 구역에 등록된 전체 식물 개체 수</div>
-        <span class="metric-badge-ok">층·구역별 상세 정보는 “식물 관리” 메뉴</span>
+        <div class="card-title">등록 식물 수</div>
+        <div class="metric-main" id="stat-plants">—</div>
+        <div class="metric-sub">등록된 실내 식물 개체·군집 수</div>
+        <span class="metric-badge-ok">식물 정보 연동 예정</span>
       </article>
 
       <article class="card">
-        <div class="card-title">작업자</div>
-        <div class="metric-main">3</div>
-        <div class="metric-sub">실내 조경 관리에 배정된 작업 인원</div>
-        <span class="metric-badge-ok">상시 투입 인원 기준</span>
+        <div class="card-title">오늘 작업</div>
+        <div class="metric-main" id="stat-today-tasks">—</div>
+        <div class="metric-sub">금일 예정 · 처리 작업 상태</div>
+        <span class="metric-badge-warn">우선 작업 자동 추천 예정</span>
       </article>
 
       <article class="card">
-        <div class="card-title">오늘의 작업</div>
-        <div class="metric-main">1</div>
-        <div class="metric-sub">금일 예정된 실내 조경 작업 건수 · 아직 0건 완료</div>
-        <span class="metric-badge-warn">우선 작업: 로비 관수/정비</span>
+        <div class="card-title">활동 작업자</div>
+        <div class="metric-main" id="stat-workers">—</div>
+        <div class="metric-sub">최근 3일 내 작업을 기록한 인원</div>
+        <span class="metric-badge-ok">근무 분배 체크 용도</span>
       </article>
 
       <article class="card">
-        <div class="card-title">오늘 완료율</div>
-        <div class="metric-main">0.0%</div>
-        <div class="metric-sub">완료된 작업 / 전체 작업 비율</div>
-        <span class="metric-badge-danger">금일 작업 시작 전 상태</span>
+        <div class="card-title">완료율</div>
+        <div class="metric-main" id="stat-completion">—%</div>
+        <div class="metric-sub">오늘 완료 / 전체 작업 비율</div>
+        <span class="metric-badge-danger">업무 진행 상황 표시</span>
       </article>
     </section>
 
-    <!-- 가운데: 그래프 2개 -->
     <section class="layout-grid">
+
+      <!-- 왼쪽 메인 -->
       <div class="left-main">
+
+        <!-- 그래프 2개 -->
         <section class="top-grid">
-          <!-- 주간 작업 통계 (도넛) -->
+
+          <!-- 1) 주간 작업 (도넛) -->
           <article class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">주간 작업 통계</div>
-                <div class="card-sub">
-                  이번 주 실내 조경 작업 완료/미완료 비율입니다.
-                </div>
+                <div class="card-title">주간 작업 완료율</div>
+                <div class="card-sub">최근 7일 작업 처리 상태</div>
               </div>
             </div>
+
             <div class="chart-area">
-              <div style="width:92%; height:86%; display:flex; flex-direction:column;">
-                <canvas id="weeklyTasksChart" style="flex:1 1 auto;"></canvas>
-                <div style="font-size:11px; color:#6b7280; margin-top:6px;">
-                  ※ 데모 데이터 기준 · 추후 LSMS INDOOR 백엔드 연동
-                </div>
-              </div>
+              <canvas id="weeklyTasksChart"></canvas>
             </div>
           </article>
 
-          <!-- 월간 작업 현황 (라인) -->
+          <!-- 2) 월간 작업 (라인) -->
           <article class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">월간 작업 현황</div>
-                <div class="card-sub">
-                  주차별 완료된 실내 조경 작업 추이입니다.
-                </div>
+                <div class="card-title">월간 작업 추이</div>
+                <div class="card-sub">주차별 실내 작업량 변화</div>
               </div>
             </div>
+
             <div class="chart-area">
-              <div style="width:92%; height:86%; display:flex; flex-direction:column;">
-                <canvas id="monthlyTasksChart" style="flex:1 1 auto;"></canvas>
-                <div style="font-size:11px; color:#6b7280; margin-top:6px;">
-                  ※ 완료 작업 건수(주간 합계) · 샘플 값
-                </div>
-              </div>
+              <canvas id="monthlyTasksChart"></canvas>
             </div>
           </article>
+
         </section>
 
-        <!-- 하단: 작업·급수 요약 카드 -->
+        <!-- 하단 카드 -->
         <section class="bottom-grid" style="margin-top:16px;">
+
           <article class="card">
             <div class="card-title">미완료 작업</div>
-            <div class="metric-main">7건</div>
-            <div class="metric-sub">
-              최근 일주일 기준 미완료 상태인 실내 조경 작업 건수입니다.
-            </div>
-            <span class="metric-badge-warn">상세 확인: 관리 ▸ 작업자 기록 관리</span>
+            <div class="metric-main" id="stat-uncompleted">—</div>
+            <div class="metric-sub">최근 7일 기준 미처리 작업 수</div>
+            <span class="metric-badge-warn">스케줄 관리 필요</span>
           </article>
 
           <article class="card">
-            <div class="card-title">활동 작업자</div>
-            <div class="metric-main">3명</div>
-            <div class="metric-sub">
-              최근 3일 내 기록을 남긴 실내 조경 담당자 수입니다.
-            </div>
-            <span class="metric-badge-ok">작업 분배 및 업무량 점검 용도</span>
+            <div class="card-title">급수 요약</div>
+            <div class="metric-main" id="stat-watering">—</div>
+            <div class="metric-sub">최근 급수 기록 기반 데이터</div>
+            <span class="metric-badge-ok">실외 급수 시스템 재사용</span>
           </article>
 
           <article class="card">
-            <div class="card-title">리포트</div>
-            <div class="metric-main">보고서</div>
-            <div class="metric-sub">
-              주간·월간 자동 보고서 생성 상태를 요약합니다.
-            </div>
-            <span class="metric-badge-ok">PDF 자동 생성 기능 연동 예정</span>
+            <div class="card-title">리포트 상태</div>
+            <div class="metric-main">PDF</div>
+            <div class="metric-sub">주간·월간 자동 보고서 생성 예정</div>
+            <span class="metric-badge-ok">자동화 준비</span>
           </article>
 
           <article class="card">
-            <div class="card-title">급수량 통계</div>
-            <div class="metric-main">분석</div>
-            <div class="metric-sub">
-              식물별 급수량·관수 패턴 데이터 기반 분석 결과입니다.
-            </div>
-            <span class="metric-badge-ok">실외 급수량 시스템과 동일 구조 사용</span>
+            <div class="card-title">센서 상태</div>
+            <div class="metric-main" id="stat-sensors">—</div>
+            <div class="metric-sub">조도·토양·온습도 측정 장비</div>
+            <span class="metric-badge-ok">실내 센서 연동 예정</span>
           </article>
+
         </section>
       </div>
 
-      <!-- 오른쪽: 층별 조경·안내 패널 -->
+      <!-- 오른쪽 패널 -->
       <aside class="right-panel">
         <article class="card">
+
           <div class="weather-card-header">
             <div>
-              <div class="weather-title">층별 조경 배치도 · 안내</div>
+              <div class="weather-title">층별 조경 안내</div>
               <div class="weather-sub">
-                서관/동관/아트리움 기준 실내 조경 관리 구역입니다.
+                서관, 동관, 아트리움 기준 구역 정보
               </div>
             </div>
-            <span class="weather-badge-today">구조도 연동 예정</span>
+            <span class="weather-badge-today">도면 연동 준비중</span>
           </div>
 
           <div class="weather-today" style="align-items:flex-start;">
             <div>
-              <div class="weather-today-main" style="font-size:18px;">층 선택 대기</div>
+              <div class="weather-today-main" style="font-size:19px;">
+                층 선택 대기
+              </div>
               <div class="weather-today-meta">
-                건물 구조도에서 층을 클릭하면 상세 정보가 표시될 예정입니다.
+                도면에서 층을 클릭하면 구역별 식물 정보가 표시됩니다.
               </div>
             </div>
+
             <div class="weather-today-extra" style="font-size:12px;">
-              · 층별 식물 수<br />
-              · 최근 급수/방제 이력<br />
-              · 담당 작업자/주요 이슈<br />
+              • 층별 플랜터 수<br>
+              • 최근 급수 이력<br>
+              • 방제/정비 내역<br>
+              • 우선 점검 구역
             </div>
           </div>
 
-          <div class="weather-forecast-title">예시: 관리 대상 층</div>
+          <div class="weather-forecast-title">관리 중인 주요 층</div>
+
           <div class="weather-forecast-list">
+
             <div class="forecast-row">
-              <div class="forecast-day">서관 18층</div>
-              <div class="forecast-meta">회의실·라운지 조경 구역 · 관엽 위주</div>
-              <div class="forecast-temp">점검 주기 1주</div>
+              <div class="forecast-day">서관 18F</div>
+              <div class="forecast-meta">라운지 & 회의실 조경</div>
+              <div class="forecast-temp">점검 1주</div>
             </div>
+
             <div class="forecast-row">
-              <div class="forecast-day">서관 1층 로비</div>
-              <div class="forecast-meta">주 출입구 로비 · 관엽/수경 혼합</div>
-              <div class="forecast-temp">점검 주기 2일</div>
+              <div class="forecast-day">서관 1F 로비</div>
+              <div class="forecast-meta">출입 로비 대형 플랜터</div>
+              <div class="forecast-temp">점검 2일</div>
             </div>
+
             <div class="forecast-row">
-              <div class="forecast-day">동관 3층</div>
-              <div class="forecast-meta">카페테리아 주변 플랜터</div>
-              <div class="forecast-temp">점검 주기 3일</div>
+              <div class="forecast-day">동관 3F</div>
+              <div class="forecast-meta">카페 주변 조경</div>
+              <div class="forecast-temp">점검 3일</div>
             </div>
+
           </div>
 
-          <div class="alert-section-title" style="margin-top:10px;">향후 기능</div>
+          <div class="alert-section-title" style="margin-top:12px;">향후 기능</div>
           <div class="alert-hint">
-            층별 도면과 연동하여 “어느 층의 어떤 구역을 우선 점검해야 하는지” 자동으로 표시하는 기능을 추가할 예정입니다.
+            도면과 플랜터 위치 연동하여<br>
+            “우선 점검해야 하는 실내 구역”을<br>
+            자동으로 표시할 예정입니다.
           </div>
+
         </article>
       </aside>
-    </section>
 
+    </section>
   </main>
+
 </body>
 </html>
