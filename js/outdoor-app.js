@@ -47,6 +47,7 @@ let CURRENT_USER_ROLE = "guest";
     const userLabel = document.getElementById("outdoorUserLabel");
     const siteLabel = document.getElementById("outdoorSiteLabel");
     const logoutBtn = document.getElementById("outdoorLogoutBtn");
+    const navAdmin = document.getElementById("navAdminUsers");
 
     if (userLabel) {
       const roleLabel =
@@ -76,6 +77,15 @@ let CURRENT_USER_ROLE = "guest";
         }
         window.location.href = "/index.html";
       });
+    }
+
+    // 관리자 전용 메뉴 표시
+    if (navAdmin) {
+      if (CURRENT_USER_ROLE === "admin") {
+        navAdmin.style.display = "";
+      } else {
+        navAdmin.style.display = "none";
+      }
     }
   });
 })();
