@@ -93,8 +93,14 @@ function updateAllTreeRisks(treeData, weatherToday) {
 function getTodayTopRisk(treeData) {
   if (!Array.isArray(treeData)) return [];
   return [...treeData]
-    .filter((t) => typeof t.risk_instant === "number")
-    .sort((a, b) => (b.risk_instant || 0) - (a.risk_instant || 0))
+    .map((t) => {
+      let score = 0;
+      if (typeof t.risk_instant === "number") score = t.risk_instant;
+      else if (typeof t.risk_base === "number") score = t.risk_base;
+      else if (typeof t.risk_score === "number") score = t.risk_score;
+      return { tree: t, score };
+    })
+    .sort((a, b) => b.score - a.score)
     .slice(0, 5);
 }
 
@@ -111,14 +117,21 @@ function renderTopRiskList(treeData) {
 
   container.innerHTML = top
     .map(
-      (tree, idx) => `
+      (entry, idx) => {
+        const tree = entry.tree || entry;
+        const score =
+          typeof tree.risk_instant === "number"
+            ? tree.risk_instant
+            : entry.score || 0;
+        return `
       <div class="top-risk-item">
         <span class="rank">${idx + 1}</span>
         <span class="id">${tree.id || "-"}</span>
         <span class="species">${tree.species || "-"}</span>
-        <span class="score">${tree.risk_instant ?? 0}점</span>
+        <span class="score">${score}점</span>
       </div>
-    `
+    `;
+      }
     )
     .join("");
 }
