@@ -1,8 +1,84 @@
 // ===== LSMS OUTDOOR · 앱 초기 구동 스크립트 =====
 
-// 현재 접속자 권한 (임시 설정)
+// 현재 접속자 권한
 // 'admin' | 'worker' | 'guest' 로 사용할 수 있음
-const CURRENT_USER_ROLE = 'admin';
+let CURRENT_USER_ROLE = "guest";
+
+// 간단한 OUTDOOR 전용 로그인/권한 체크
+// - localStorage.lsmsUser 를 읽어서 scope === "outdoor" 인지 확인
+// - 없거나 잘못된 경우 포털(/index.html)로 돌려보냄
+(function initOutdoorAuth() {
+  let raw = null;
+  try {
+    raw = window.localStorage.getItem("lsmsUser");
+  } catch (e) {
+    console.warn("localStorage 접근 오류:", e);
+  }
+
+  if (!raw) {
+    alert("로그인 정보가 없습니다.\n포털 화면에서 다시 로그인해 주세요.");
+    window.location.href = "/index.html";
+    return;
+  }
+
+  let user = null;
+  try {
+    user = JSON.parse(raw);
+  } catch (e) {
+    console.error("lsmsUser JSON 파싱 오류:", e);
+    window.localStorage.removeItem("lsmsUser");
+    alert("로그인 정보가 손상되었습니다.\n포털 화면에서 다시 로그인해 주세요.");
+    window.location.href = "/index.html";
+    return;
+  }
+
+  if (user.scope && user.scope !== "outdoor") {
+    alert("실외조경 화면은 '실외조경'으로 로그인한 경우에만 접속할 수 있습니다.");
+    window.location.href = "/index.html";
+    return;
+  }
+
+  // 전역에서 참고할 수 있게 저장
+  window.LSMS_USER = user;
+  CURRENT_USER_ROLE = user.role || "guest";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    // 상단 상태 표시 업데이트
+    const userLabel = document.getElementById("outdoorUserLabel");
+    const siteLabel = document.getElementById("outdoorSiteLabel");
+    const logoutBtn = document.getElementById("outdoorLogoutBtn");
+
+    if (userLabel) {
+      const roleLabel =
+        user.role === "admin"
+          ? "관리자"
+          : user.role === "worker"
+          ? "작업자"
+          : "사용자";
+      userLabel.textContent = `${user.id} (${roleLabel})`;
+    }
+
+    if (siteLabel) {
+      const siteMap = {
+        yangjae: "양재 HQ",
+        gangnam: "강남사옥",
+        future: "미래 사업장",
+      };
+      siteLabel.textContent = siteMap[user.site] || "현장 미지정";
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        try {
+          window.localStorage.removeItem("lsmsUser");
+        } catch (e) {
+          console.error("localStorage 제거 오류:", e);
+        }
+        window.location.href = "/index.html";
+      });
+    }
+  });
+})();
 
 // DOM이 모두 준비되면 실행
 window.addEventListener("DOMContentLoaded", () => {
