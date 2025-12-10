@@ -131,6 +131,13 @@ function renderTreesOnMap() {
     marker._lsmsTreeId = tree.id;
     markersById[tree.id] = marker;
 
+    // tree 객체에도 마커 참조 저장 (위험도 스타일링 등에서 활용 가능)
+    try {
+      tree.marker = marker;
+    } catch (e) {
+      // 읽기 전용일 수 있으므로 실패해도 무시
+    }
+
     marker.on("click", () => {
       map.setView([tree.lat, tree.lng], 18, { animate: true });
       if (typeof openTreeDetailPanel === "function") {
@@ -193,6 +200,19 @@ window.LSMS_MAP_DRAG = {
     const hint = document.getElementById("detailLocationHint");
     if (hint) hint.classList.add("hidden");
   },
+};
+
+// 위험도 수준에 따른 마커 강조 (HIGH 수목 등)
+window.updateTreeMarkersByRisk = function (treeData) {
+  const all = Array.isArray(treeData) ? treeData : getAllTreesForMap();
+  all.forEach((t) => {
+    const marker = t.marker || markersById[t.id];
+    if (!marker || !marker._icon) return;
+    marker._icon.classList.remove("blink");
+    if ((t.risk_level || "").toUpperCase() === "HIGH") {
+      marker._icon.classList.add("blink");
+    }
+  });
 };
 
 // 팝업 탭 버튼 전역 처리

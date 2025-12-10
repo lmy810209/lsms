@@ -211,6 +211,8 @@ function treesInit() {
           height: t.height,
           dbh: t.dbh,
           crown: t.crown,
+          crown_width: t.crown_width,
+          crown_height: t.crown_height,
           planted_year: t.planted_year,
           health_score: t.health_score,
           memo: (t.history && t.history.memo) || "",
@@ -264,6 +266,8 @@ function treesInit() {
             t.height = originalTreeDataSnapshot.height;
             t.dbh = originalTreeDataSnapshot.dbh;
             t.crown = originalTreeDataSnapshot.crown;
+            t.crown_width = originalTreeDataSnapshot.crown_width;
+            t.crown_height = originalTreeDataSnapshot.crown_height;
             t.planted_year = originalTreeDataSnapshot.planted_year;
             t.health_score = originalTreeDataSnapshot.health_score;
             if (!t.history) t.history = {};
@@ -307,7 +311,9 @@ function treesInit() {
         }
         if (detailInputs.crown) {
           const v = detailInputs.crown.value;
-          t.crown = v ? Number(v) : null;
+          const num = v ? Number(v) : null;
+          t.crown = num;
+          t.crown_width = num;
         }
         if (detailInputs.year) {
           const v = detailInputs.year.value;
@@ -495,7 +501,9 @@ function treesInit() {
         lng,
         height,
         dbh,
-        crown,
+        crown: crown,
+        crown_width: crown,
+        crown_height: null,
         planted_year: plantedYear,
         slope: null,
         tilt: null,
@@ -503,8 +511,8 @@ function treesInit() {
         drainage: "",
         trunk_crack: false,
         crown_lean: "",
-        risk_score: null,
-        health_score: null,
+        risk_base: 0,
+        risk_instant: 0,
         risk_level: "LOW",
         history: { memo: "" },
         disease: { has_issue: false, last_date: "-", detail: "-" },
@@ -787,9 +795,15 @@ function openTreeDetailPanel(tree, mode = "view") {
   if (detailSpans.dbh)
     detailSpans.dbh.textContent =
       (tree.dbh != null ? tree.dbh + " cm" : "-");
-  if (detailSpans.crown)
-    detailSpans.crown.textContent =
-      (tree.crown != null ? tree.crown + " m" : "-");
+  if (detailSpans.crown) {
+    const cw =
+      tree.crown_width != null
+        ? tree.crown_width
+        : tree.crown != null
+        ? tree.crown
+        : null;
+    detailSpans.crown.textContent = cw != null ? cw + " m" : "-";
+  }
   if (detailSpans.year)
     detailSpans.year.textContent =
       tree.planted_year != null ? tree.planted_year : "-";

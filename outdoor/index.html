@@ -343,6 +343,19 @@
               <button id="btnDeleteTree" type="button" class="btn btn-sm btn-ghost details-danger">삭제</button>
             </div>
           </div>
+
+          <!-- 오늘 우선 점검 대상 TOP5 -->
+          <article class="card top-risk-card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">오늘 우선 점검 대상 TOP5</div>
+                <div class="card-sub">
+                  실시간 전도 위험도(risk_instant)가 높은 순서대로 상위 5개 수목을 보여줍니다.
+                </div>
+              </div>
+            </div>
+            <div id="topRiskList" class="top-risk-list"></div>
+          </article>
         </aside>
       </div>
     </section>

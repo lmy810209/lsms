@@ -1,40 +1,142 @@
-// LSMS 두뇌 서버에 전도 위험 계산 요청
-async function requestRiskFromCore(angle, slope, wind) {
-  const params = new URLSearchParams({
-    angle: String(angle),
-    slope: String(slope),
-    wind: String(wind),
-  });
+// ===== 전도 위험도 계산 및 TOP5 리스트 =====
 
-  const url = `http://127.0.0.1:5001/api/risk?${params.toString()}`;
+// 1) 기본 전도 위험도 (수목 자체 특성 기반)
+function computeBaseRisk(tree) {
+  const h = Number.isFinite(tree.height) ? Number(tree.height) : 0;
+  const dbh = Number.isFinite(tree.dbh) ? Number(tree.dbh) : 0.0001;
+  const crown = Number.isFinite(tree.crown_width) ? Number(tree.crown_width) : (Number.isFinite(tree.crown) ? Number(tree.crown) : 0);
+  const tilt = Number.isFinite(tree.tilt) ? Number(tree.tilt) : 0;
+  const slope = Number.isFinite(tree.slope) ? Number(slope) : 0;
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error("AI 서버 호출 실패 (status " + res.status + ")");
-  }
-  return res.json();
+  const heightScore = Math.min(h / 20, 1);
+  const slender = h / (dbh / 100);
+  const slenderScore = Math.min(slender / 80, 1);
+  const crownScore = Math.min(crown / 10, 1);
+  const tiltScore = Math.min(tilt / 45, 1);
+  const slopeScore = Math.min(slope / 30, 1);
+
+  const speciesFactor =
+    {
+      "소나무": 1.1,
+      "은행나무": 0.8,
+      "느티나무": 1.0,
+    }[tree.species] ?? 1.0;
+
+  const weighted =
+    0.25 * heightScore +
+    0.2 * slenderScore +
+    0.2 * crownScore +
+    0.2 * tiltScore +
+    0.15 * slopeScore;
+
+  const baseScore = Math.min(100, Math.round(weighted * 100 * speciesFactor));
+  return baseScore;
 }
 
-// 페이지 로드 후 버튼 이벤트 연결
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("btnRiskTest");
-  if (!btn) return;
+// 2) 실시간 날씨 계수
+function computeWeatherFactor(weather) {
+  const wind = weather?.wind_max ?? weather?.wind_avg ?? 0;
+  const rain = weather?.rain_mm ?? 0;
+  const snow = weather?.snow_cm ?? 0;
 
-  btn.addEventListener("click", async () => {
-    const angle = Number(document.getElementById("inputAngle")?.value || 0);
-    const slope = Number(document.getElementById("inputSlope")?.value || 0);
-    const wind = Number(document.getElementById("inputWind")?.value || 0);
-    const box = document.getElementById("riskTestResult");
+  let f_wind = 1.0;
+  if (wind > 5) f_wind = 1.1;
+  if (wind > 8) f_wind = 1.25;
+  if (wind > 12) f_wind = 1.5;
+  if (wind > 15) f_wind = 1.8;
 
-    if (box) box.textContent = "계산 중...";
+  let f_rain = 1.0 + Math.min(rain / 50, 0.3);
+  let f_snow = 1.0 + Math.min(snow / 20, 0.3);
 
-    try {
-      const data = await requestRiskFromCore(angle, slope, wind);
-      if (!box) return;
-      box.textContent = `점수: ${data.score}, 등급: ${data.level}`;
-    } catch (err) {
-      console.error(err);
-      if (box) box.textContent = "서버 오류: " + err.message;
-    }
+  return f_wind * f_snow * f_rain;
+}
+
+// 3) 개별 수목의 실시간 전도 위험도 계산
+function computeInstantRisk(tree, weather) {
+  const base = computeBaseRisk(tree);
+  const w = computeWeatherFactor(weather || {});
+  const instant = Math.min(100, Math.round(base * w));
+
+  let level = "LOW";
+  if (instant >= 40) level = "MID";
+  if (instant >= 70) level = "HIGH";
+
+  return { base, instant, level };
+}
+
+// 4) 전체 트리에 위험도 필드 반영
+function updateAllTreeRisks(treeData, weatherToday) {
+  if (!Array.isArray(treeData)) return;
+  const weather = weatherToday || window.LSMS_WEATHER_TODAY || null;
+
+  treeData.forEach((tree) => {
+    const { base, instant, level } = computeInstantRisk(tree, weather);
+    tree.risk_base = base;
+    tree.risk_instant = instant;
+    tree.risk_level = level;
   });
-});
+}
+
+// 5) 위험도 기준 TOP5 추출
+function getTodayTopRisk(treeData) {
+  if (!Array.isArray(treeData)) return [];
+  return [...treeData]
+    .filter((t) => typeof t.risk_instant === "number")
+    .sort((a, b) => (b.risk_instant || 0) - (a.risk_instant || 0))
+    .slice(0, 5);
+}
+
+// 6) TOP5 리스트 렌더링
+function renderTopRiskList(treeData) {
+  const container = document.getElementById("topRiskList");
+  if (!container) return;
+
+  const top = getTodayTopRisk(treeData || window.treeData || []);
+  if (!top.length) {
+    container.innerHTML = `<div class="top-risk-empty">오늘은 우선 점검 대상 수목이 없습니다.</div>`;
+    return;
+  }
+
+  container.innerHTML = top
+    .map(
+      (tree, idx) => `
+      <div class="top-risk-item">
+        <span class="rank">${idx + 1}</span>
+        <span class="id">${tree.id || "-"}</span>
+        <span class="species">${tree.species || "-"}</span>
+        <span class="score">${tree.risk_instant ?? 0}점</span>
+      </div>
+    `
+    )
+    .join("");
+}
+
+// 7) 대시보드 전체 위험도/마커/그래프 업데이트
+function refreshRiskDashboard() {
+  const data =
+    (typeof getTreeData === "function" && getTreeData()) ||
+    window.treeData ||
+    [];
+  const weather = window.LSMS_WEATHER_TODAY || null;
+
+  updateAllTreeRisks(data, weather);
+
+  if (typeof window.updateTreeMarkersByRisk === "function") {
+    window.updateTreeMarkersByRisk(data);
+  }
+
+  if (typeof window.updateRiskChart === "function") {
+    window.updateRiskChart();
+  }
+
+  renderTopRiskList(data);
+}
+
+// 전역으로 노출
+window.computeBaseRisk = computeBaseRisk;
+window.computeWeatherFactor = computeWeatherFactor;
+window.computeInstantRisk = computeInstantRisk;
+window.updateAllTreeRisks = updateAllTreeRisks;
+window.updateTreeMarkers = window.updateTreeMarkersByRisk;
+window.getTodayTopRisk = getTodayTopRisk;
+window.refreshRiskDashboard = refreshRiskDashboard;

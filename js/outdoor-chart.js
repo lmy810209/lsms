@@ -28,7 +28,14 @@ function getZoneRiskSummary() {
     }
 
     const sum = items.reduce((acc, t) => {
-      const v = typeof t.risk_score === "number" ? t.risk_score : 0;
+      let v = 0;
+      if (typeof t.risk_instant === "number") {
+        v = t.risk_instant;
+      } else if (typeof t.risk_base === "number") {
+        v = t.risk_base;
+      } else if (typeof t.risk_score === "number") {
+        v = t.risk_score;
+      }
       return acc + v;
     }, 0);
 

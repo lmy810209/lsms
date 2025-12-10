@@ -582,6 +582,56 @@
   background: radial-gradient(circle at 30% 20%, #9ee7c2, #35c46b);
 }
 
+.blink {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* ===== 오늘 우선 점검 대상 TOP5 카드 ===== */
+.top-risk-card {
+  margin-top: 16px;
+}
+
+.top-risk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.top-risk-item {
+  display: grid;
+  grid-template-columns: 20px 1fr 1fr 50px;
+  align-items: center;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: #0f172a;
+}
+
+.top-risk-item .rank {
+  font-weight: 700;
+  color: #facc15;
+}
+
+.top-risk-item .id {
+  font-weight: 600;
+}
+
+.top-risk-item .score {
+  justify-self: flex-end;
+  font-weight: 600;
+}
+
+.top-risk-empty {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
 .tree-popup {
   min-width: 260px;
   max-width: 320px;
