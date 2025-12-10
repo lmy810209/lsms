@@ -6,6 +6,24 @@ let markersById = {};
 let MAP_LAYER_MODE = "all"; // 'all' | 'risk' | 'pest'
 const RISK_FILTER = { HIGH: true, MID: true, LOW: true };
 
+// 현재 사용 가능한 수목 배열을 안전하게 가져오는 헬퍼
+function getAllTreesForMap() {
+  if (typeof getTreeData === "function") {
+    return getTreeData() || [];
+  }
+  if (
+    window.LSMS &&
+    window.LSMS.outdoor &&
+    typeof window.LSMS.outdoor.getTrees === "function"
+  ) {
+    return window.LSMS.outdoor.getTrees() || [];
+  }
+  if (Array.isArray(window.treeData)) {
+    return window.treeData;
+  }
+  return [];
+}
+
 // 지도 초기화
 function mapInit() {
   const mapboxToken =
@@ -36,7 +54,7 @@ function mapInit() {
     addTree(e.latlng.lat, e.latlng.lng);
   });
 
-  // 초기 렌더 (기본 treeData 사용)
+  // 초기 렌더
   if (typeof renderTrees === "function") {
     renderTrees();
   } else {
@@ -51,7 +69,9 @@ function renderTreesOnMap() {
   markerLayer.clearLayers();
   markersById = {};
 
-  treeData.forEach((tree, index) => {
+  const trees = getAllTreesForMap();
+
+  trees.forEach((tree, index) => {
     const number = index + 1;
     const riskLevelRaw = (tree.risk_level || "LOW").toUpperCase();
     let riskKey = "LOW";
@@ -268,7 +288,8 @@ function renderTreesOnMap() {
 
 // 특정 수목 아이디로 포커스
 function focusTree(treeId) {
-  const tree = treeData.find((t) => t.id === treeId);
+  const trees = getAllTreesForMap();
+  const tree = trees.find((t) => t.id === treeId);
   const marker = markersById[treeId];
   if (!tree || !marker || !map) return;
   map.setView([tree.lat, tree.lng], 18, { animate: true });
