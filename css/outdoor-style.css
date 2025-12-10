@@ -277,6 +277,12 @@
   color: #b91c1c;
 }
 
+.details-hint {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #059669;
+}
+
 /* ===== 공통 모달 (새 수목 등록 등) ===== */
 .lsms-modal-backdrop {
   position: fixed;

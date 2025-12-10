@@ -6,6 +6,28 @@ let markersById = {};
 let MAP_LAYER_MODE = "all"; // 'all' | 'risk' | 'pest'
 const RISK_FILTER = { HIGH: true, MID: true, LOW: true };
 
+// 마커 드래그 상태 저장용
+const MARKER_DRAG_STATE = {}; // treeId -> { originalLatLng, editedLatLng }
+
+function handleMarkerDragEnd(e) {
+  const marker = e.target;
+  const treeId = marker && marker._lsmsTreeId;
+  if (!treeId) return;
+
+  if (!MARKER_DRAG_STATE[treeId]) {
+    MARKER_DRAG_STATE[treeId] = {
+      originalLatLng: marker.getLatLng(),
+      editedLatLng: null,
+    };
+  }
+  MARKER_DRAG_STATE[treeId].editedLatLng = marker.getLatLng();
+
+  const hint = document.getElementById("detailLocationHint");
+  if (hint) {
+    hint.classList.remove("hidden");
+  }
+}
+
 // 현재 사용 가능한 수목 배열을 안전하게 가져오는 헬퍼
 function getAllTreesForMap() {
   if (typeof getTreeData === "function") {
@@ -106,6 +128,7 @@ function renderTreesOnMap() {
     });
 
     const marker = L.marker([tree.lat, tree.lng], { icon }).addTo(markerLayer);
+    marker._lsmsTreeId = tree.id;
     markersById[tree.id] = marker;
 
     marker.on("click", () => {
@@ -128,6 +151,49 @@ function focusTree(treeId) {
     openTreeDetailPanel(tree, "view");
   }
 }
+
+// 수목 마커 드래그 제어 API (trees.js에서 사용)
+window.LSMS_MAP_DRAG = {
+  enable(treeId) {
+    const marker = markersById[treeId];
+    if (!marker || !marker.dragging) return;
+    const latLng = marker.getLatLng();
+    MARKER_DRAG_STATE[treeId] = {
+      originalLatLng: latLng,
+      editedLatLng: null,
+    };
+    marker.dragging.enable();
+    marker.on("dragend", handleMarkerDragEnd);
+  },
+  apply(treeId) {
+    const marker = markersById[treeId];
+    const state = MARKER_DRAG_STATE[treeId];
+    if (marker && marker.dragging) {
+      marker.dragging.disable();
+      marker.off("dragend", handleMarkerDragEnd);
+    }
+    if (!state) return null;
+    const finalLatLng = state.editedLatLng || state.originalLatLng;
+    delete MARKER_DRAG_STATE[treeId];
+    const hint = document.getElementById("detailLocationHint");
+    if (hint) hint.classList.add("hidden");
+    return finalLatLng;
+  },
+  cancel(treeId) {
+    const marker = markersById[treeId];
+    const state = MARKER_DRAG_STATE[treeId];
+    if (marker && marker.dragging) {
+      if (state && state.originalLatLng) {
+        marker.setLatLng(state.originalLatLng);
+      }
+      marker.dragging.disable();
+      marker.off("dragend", handleMarkerDragEnd);
+    }
+    delete MARKER_DRAG_STATE[treeId];
+    const hint = document.getElementById("detailLocationHint");
+    if (hint) hint.classList.add("hidden");
+  },
+};
 
 // 팝업 탭 버튼 전역 처리
 document.addEventListener("click", (event) => {

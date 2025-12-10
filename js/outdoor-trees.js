@@ -89,6 +89,7 @@ let detailCancelBtn = null;
 let detailDeleteBtn = null;
 let detailCloseBtn = null;
 let detailEditMode = false;
+let originalTreeDataSnapshot = null;
 
 // ===== 리스트 초기화 =====
 function treesInit() {
@@ -202,6 +203,21 @@ function treesInit() {
         if (currentTreeIndex < 0 || currentTreeIndex >= data.length) return;
         const t = data[currentTreeIndex];
 
+        // 원본 값 백업 (취소용)
+        originalTreeDataSnapshot = {
+          id: t.id,
+          species: t.species,
+          zone: t.zone,
+          height: t.height,
+          dbh: t.dbh,
+          crown: t.crown,
+          planted_year: t.planted_year,
+          health_score: t.health_score,
+          memo: (t.history && t.history.memo) || "",
+          lat: t.lat,
+          lng: t.lng,
+        };
+
         // 입력 값에 현재 값을 채워 넣기
         if (detailInputs.id) detailInputs.id.value = t.id || "";
         if (detailInputs.species) detailInputs.species.value = t.species || "";
@@ -219,11 +235,47 @@ function treesInit() {
             (t.history && t.history.memo) || "";
 
         setDetailMode(true);
+
+        // 편집 모드에서만 마커 드래그 활성화
+        if (window.LSMS_MAP_DRAG && typeof window.LSMS_MAP_DRAG.enable === "function") {
+          window.LSMS_MAP_DRAG.enable(t.id);
+        }
       });
     }
 
     if (detailCancelBtn) {
       detailCancelBtn.addEventListener("click", () => {
+        // 위치 되돌리기
+        if (
+          window.LSMS_MAP_DRAG &&
+          typeof window.LSMS_MAP_DRAG.cancel === "function" &&
+          originalTreeDataSnapshot
+        ) {
+          window.LSMS_MAP_DRAG.cancel(originalTreeDataSnapshot.id);
+        }
+
+        // 데이터 되돌리기
+        if (originalTreeDataSnapshot && currentTreeIndex != null) {
+          const data = getTreeData();
+          if (currentTreeIndex >= 0 && currentTreeIndex < data.length) {
+            const t = data[currentTreeIndex];
+            t.species = originalTreeDataSnapshot.species;
+            t.zone = originalTreeDataSnapshot.zone;
+            t.height = originalTreeDataSnapshot.height;
+            t.dbh = originalTreeDataSnapshot.dbh;
+            t.crown = originalTreeDataSnapshot.crown;
+            t.planted_year = originalTreeDataSnapshot.planted_year;
+            t.health_score = originalTreeDataSnapshot.health_score;
+            if (!t.history) t.history = {};
+            t.history.memo = originalTreeDataSnapshot.memo;
+            t.lat = originalTreeDataSnapshot.lat;
+            t.lng = originalTreeDataSnapshot.lng;
+            setTreeData(data);
+            openTreeDetailPanel(t, "view");
+          }
+        }
+
+        originalTreeDataSnapshot = null;
         setDetailMode(false);
       });
     }
@@ -271,8 +323,21 @@ function treesInit() {
         }
         t.updated_at = new Date().toISOString().slice(0, 10);
 
+        // 위치 변경 반영
+        if (
+          window.LSMS_MAP_DRAG &&
+          typeof window.LSMS_MAP_DRAG.apply === "function"
+        ) {
+          const finalLatLng = window.LSMS_MAP_DRAG.apply(t.id);
+          if (finalLatLng) {
+            t.lat = finalLatLng.lat;
+            t.lng = finalLatLng.lng;
+          }
+        }
+
         setTreeData(data);
         openTreeDetailPanel(t, "view");
+        originalTreeDataSnapshot = null;
       });
     }
 
