@@ -96,6 +96,12 @@ function treesInit() {
   treeAddDbhEl = document.getElementById("treeAddDbh");
   treeAddCrownEl = document.getElementById("treeAddCrown");
 
+  // 초기에는 항상 추가 모드/모달을 완전히 끈 상태로 시작
+  addMode = false;
+  if (treeAddModal) {
+    treeAddModal.hidden = true;
+  }
+
   // 검색
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
