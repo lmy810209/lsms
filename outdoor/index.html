@@ -105,269 +105,140 @@
 
   <!-- ========== 메인 영역 ========== -->
   <main class="main">
-    <!-- 상단 제목 -->
-    <header class="main-header">
-      <div class="main-header-left">
+
+    <!-- 상단 페이지 헤더 -->
+    <header class="page-header">
+      <div class="page-header-left">
         <!-- 모바일 전용 햄버거 버튼 -->
         <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-
-        <div>
-          <div class="main-title">양재 HQ 실외조경 현황 · LSMS OUTDOOR</div>
-          <div class="main-subtitle">
-            기상·지형·수목 상태를 기준으로 전도 위험·병해충 위험을 예측하는 실외 수목 관리 전용 대시보드입니다.
-          </div>
+        <h1 class="page-title">양재 HQ 실외조경 현황</h1>
+        <p class="page-subtitle">
+          기상·지형·수목 데이터를 기반으로 전도 위험·병해충 위험을 예측하는 LSMS OUTDOOR 전용 대시보드입니다.
+        </p>
+        <div class="page-tags">
+          <span class="pill pill-soft">LSMS OUTDOOR</span>
+          <span class="pill pill-soft">양재 HQ</span>
+          <span class="pill pill-soft">베타 버전</span>
         </div>
       </div>
 
-      <div class="status-badges">
-        <div class="status-pill">
-          <span class="status-dot"></span>
-          <span id="outdoorUserLabel">실시간 모니터링 온라인</span>
+      <div class="page-header-right">
+        <div class="field-inline field-inline-sm">
+          <label class="field-label-sm">현장</label>
+          <select class="select select-sm" id="siteSelect">
+            <option value="yangjae">양재 HQ</option>
+            <option value="gangnam">강남사옥</option>
+          </select>
         </div>
-        <div class="status-site">
+
+        <div class="field-inline field-inline-sm">
+          <label class="field-label-sm">기간</label>
+          <select class="select select-sm" id="rangeSelect">
+            <option value="today">오늘</option>
+            <option value="7d">최근 7일</option>
+            <option value="30d">최근 30일</option>
+          </select>
+        </div>
+
+        <span class="pill pill-soft" id="outdoorUserLabel">실시간 모니터링 온라인</span>
+        <span class="pill pill-soft">
           현장: <span id="outdoorSiteLabel">현대차 양재 본사</span>
-          <button class="status-logout-btn" id="outdoorLogoutBtn">로그아웃</button>
-        </div>
+        </span>
+        <button class="btn btn-sm btn-ghost" id="outdoorLogoutBtn">로그아웃</button>
+        <button class="btn btn-sm btn-ghost" id="btnExport">보고서 내보내기</button>
+        <button class="btn btn-sm btn-primary" id="btnRefreshMain">새로고침</button>
       </div>
     </header>
 
-    <!-- 왼쪽: 지도/요약 · 오른쪽: 기상·경보 패널 -->
-    <div class="layout-grid">
-      <!-- 왼쪽 메인 영역 -->
-      <div class="left-main">
-        <!-- 상단: 지도 + 그래프 -->
-        <section class="top-grid">
-          <!-- 지도 카드 -->
-          <article class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title">양재 HQ 실외조경 지도 · 전도 위험·병해충 포인트</div>
-                <div class="card-sub">
-                  토양 경사·수간 기울기·보행 동선·과거 이력 기반 전도 위험·병해충 발생 포인트를 지도에서 직관적으로 확인합니다.
-                </div>
-                <div class="card-tag-row">
-                  <span class="card-tag"><span class="tag-color tag-blue"></span>전도 위험 예측 포인트</span>
-                  <span class="card-tag"><span class="tag-color tag-red"></span>병해충·고사 의심 수목</span>
-                  <span class="card-tag"><span class="tag-color tag-orange"></span>집중 관리 필요 구간</span>
-                </div>
-              </div>
+    <!-- 지도 + 필터 영역 -->
+    <section class="map-shell">
+      <header class="map-shell-header">
+        <div>
+          <h2 class="map-shell-title">실외조경 지도 · 전도 위험 · 병해충 포인트</h2>
+          <p class="map-shell-subtitle">
+            토양·강수·수분·기울기·통신·센서 데이터 기반으로 전도 위험 및 병해충 발생 포인트를 지도에서 직관적으로 확인합니다.
+          </p>
+        </div>
+        <div class="map-shell-actions">
+          <button class="btn btn-sm btn-ghost" id="btnTreeAdd">+ 수목 추가</button>
+          <button class="btn btn-sm btn-ghost" id="btnTreeSave">현재 뷰 저장</button>
+        </div>
+      </header>
 
-              <!-- 오른쪽: 지도 설명 + 버튼 -->
-              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; font-size:11px; color:#6b7280;">
-                <div>Map · Leaflet / Mapbox</div>
-                <div style="display:flex; gap:4px;">
-                  <button
-                    id="btnTreeAdd"
-                    style="padding:2px 8px; border-radius:999px; border:1px solid #d1d5db; background:#ffffff; font-size:11px; cursor:pointer;"
-                  >
-                    + 수목 추가
-                  </button>
-                  <button
-                    id="btnTreeSave"
-                    style="padding:2px 8px; border-radius:999px; border:1px solid #d1d5db; background:#ffffff; font-size:11px; cursor:pointer;"
-                  >
-                    저장
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="map-area">
-              <div id="map"></div>
-            </div>
-            <!-- 추가 모드 안내 문구 자리 -->
-            <div id="addModeHint"></div>
-          </article>
-
-          <!-- 그래프 카드 -->
-          <article class="card">
-            <div class="card-header">
-              <div>
-                <div class="card-title">실외 수목 위험·상태 요약</div>
-                <div class="card-sub">
-                  구역별 전도 위험 지수·병해충·건조 경향을 그래프로 한 번에 확인 (관수 지시는 하지 않고, 점검·우선순위만 표시)
-                </div>
-              </div>
-              <div style="font-size:11px; color:#6b7280;">단위: 위험 지수 (0~100, 높을수록 위험)</div>
-            </div>
-
-            <div class="card-tag-row" style="margin-bottom:8px;">
-              <span class="card-tag"><span class="tag-color tag-blue"></span>사면부(A존)</span>
-              <span class="card-tag"><span class="tag-color tag-red"></span>도로변(B존)</span>
-              <span class="card-tag"><span class="tag-color tag-orange"></span>광장·보행동선(C존)</span>
-            </div>
-
-            <div class="chart-area">
-              <div style="width:92%; height:86%; display:flex; flex-direction:column;">
-                <canvas id="riskChart" style="flex:1 1 auto;"></canvas>
-                <div style="font-size:11px; color:#6b7280; margin-top:6px;">
-                  ※ 구역별 전도 위험 지수(0~100) 평균값 · treeData 기반 자동 계산
-                </div>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <!-- 하단 요약 카드 3개 -->
-        <section class="bottom-grid">
-          <article class="card">
-            <div class="card-title">전도 위험 High 수목</div>
-            <div class="metric-main">3주</div>
-            <div class="metric-sub">
-              강풍 예보 구간과 중첩되는 개체 · 즉시 현장 점검 및 전정·지지대 보강 필요
-            </div>
-            <span class="metric-badge-danger">정문·보행 통행량 높은 구간 우선</span>
-          </article>
-
-          <article class="card">
-            <div class="card-title">병해충 의심 포인트</div>
-            <div class="metric-main">7지점</div>
-            <div class="metric-sub">
-              저조도·통풍 불량·건조 스트레스가 중첩되는 구역 · 열상/변색 발생 개체 우선 점검
-            </div>
-            <span class="metric-badge-warn">예방 방제 중심 관리 권장</span>
-          </article>
-
-          <article class="card">
-            <div class="card-title">기상·환경 우선 점검 구간</div>
-            <div class="metric-main">사면부 2구역</div>
-            <div class="metric-sub">
-              연속 강우·배수 불량 우려 구간 · 사면 붕괴·전도 위험 수목 주간 1회 이상 눈검사 권장
-            </div>
-            <span class="metric-badge-ok">관수 지시 없이 “점검 우선순위”만 안내</span>
-          </article>
-        </section>
-
-        <!-- 전도 위험 AI 테스트 패널 -->
-        <section class="card risk-test-card" style="margin-top:16px;">
-          <div class="card-header">
-            <div>
-              <div class="card-title">전도 위험 테스트 · LSMS 두뇌 연결</div>
-              <div class="card-sub">
-                실측한 수목 기울기·토양 경사·예측 최대 풍속을 넣으면, lsms-core 파이썬 엔진이 전도 위험 점수와 등급을 계산합니다.
-              </div>
+      <div class="map-shell-body">
+        <!-- 좌측 필터 패널 -->
+        <aside class="map-filter-panel">
+          <div class="map-filter-section">
+            <div class="map-filter-title">표시 레이어</div>
+            <div class="pill-toggle-group">
+              <button class="pill-toggle is-active" data-layer="risk">
+                전도 위험 예측 포인트
+              </button>
+              <button class="pill-toggle" data-layer="pest">
+                병해충·고사 의심 수목
+              </button>
+              <button class="pill-toggle" data-layer="zone">
+                광장 포켓·집중 관리 구간
+              </button>
             </div>
           </div>
 
-          <div class="risk-panel-body">
-            <div class="risk-grid">
-              <label class="risk-field">
-                <span>수목 기울기 (도)</span>
-                <input id="inputAngle" type="number" value="10" />
+          <div class="map-filter-section">
+            <div class="map-filter-title">위험도 필터</div>
+            <div class="legend-list">
+              <label class="legend-item">
+                <input type="checkbox" class="legend-checkbox" data-risk="HIGH" checked />
+                <span class="legend-color legend-high"></span>
+                <span class="legend-label">HIGH (주의 필요)</span>
               </label>
-
-              <label class="risk-field">
-                <span>토양 경사 (도)</span>
-                <input id="inputSlope" type="number" value="5" />
+              <label class="legend-item">
+                <input type="checkbox" class="legend-checkbox" data-risk="MID" checked />
+                <span class="legend-color legend-mid"></span>
+                <span class="legend-label">MID (경계)</span>
               </label>
-
-              <label class="risk-field">
-                <span>예측 최대 풍속 (m/s)</span>
-                <input id="inputWind" type="number" value="8" />
+              <label class="legend-item">
+                <input type="checkbox" class="legend-checkbox" data-risk="LOW" checked />
+                <span class="legend-color legend-low"></span>
+                <span class="legend-label">LOW (양호)</span>
               </label>
-            </div>
-
-            <button id="btnRiskTest" class="risk-button">
-              전도 위험 계산
-            </button>
-
-            <div id="riskTestResult" class="risk-result">
-              값 입력 후 "전도 위험 계산" 버튼을 눌러 주세요.
             </div>
           </div>
-        </section>
-        <!-- 전도 위험 AI 테스트 패널 끝 -->
+
+          <div class="map-filter-section">
+            <div class="map-filter-title">보기 옵션</div>
+            <label class="checkbox-row">
+              <input type="checkbox" id="chkShowLabels" checked />
+              <span>수목 ID 라벨 표시</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" id="chkCluster" checked />
+              <span>마커 클러스터링 사용</span>
+            </label>
+          </div>
+        </aside>
+
+        <!-- 우측 지도 -->
+        <div class="map-area">
+          <div class="map-toolbar">
+            <span class="map-provider-label">Map · Leaflet / Mapbox</span>
+            <div class="map-toolbar-buttons">
+              <button class="btn-icon" id="btnZoomReset" title="초기 위치로">
+                <span class="material-symbols-rounded">my_location</span>
+              </button>
+              <button class="btn-icon" id="btnMapType" title="배경 지도 전환">
+                <span class="material-symbols-rounded">layers</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="map" class="map-canvas"></div>
+          <!-- 추가 모드 안내 문구 자리 -->
+          <div id="addModeHint"></div>
+        </div>
       </div>
+    </section>
 
-      <!-- 오른쪽: 기상·강풍 + 자동 경보 패널 -->
-      <aside class="right-panel">
-        <article class="card">
-          <div class="weather-card-header">
-            <div>
-              <div class="weather-title">오늘·7일 기상 · 강풍 예보</div>
-              <div class="weather-sub">
-                양재 HQ 기준 기온·강수·풍속 요약 · 병해충·전도 위험 조기 예측용 기초 데이터
-              </div>
-            </div>
-            <span class="weather-badge-today">실시간 예보 연동 예정</span>
-          </div>
-
-          <!-- 오늘 정보 -->
-          <div class="weather-today">
-            <div>
-              <div class="weather-today-main" id="todayTemp">27°C</div>
-              <div class="weather-today-meta" id="todayMeta">체감 29°C · 습도 68%</div>
-            </div>
-            <div class="weather-today-extra" id="todayExtra">
-              강수확률 30%<br />
-              평균 풍속 4 m/s<br />
-              순간 최대 9 m/s
-            </div>
-          </div>
-
-          <!-- 7일 예보 요약 (JS로 채움) -->
-          <div class="weather-forecast-title">7일 예보</div>
-          <div class="weather-forecast-list" id="forecastList">
-            <!-- 자바스크립트에서 자동으로 행(row)들을 채워 넣음 -->
-          </div>
-
-          <!-- 기상 기반 자동 경보 -->
-          <div class="alert-section-title">기상 기반 자동 경보 (룰 엔진 샘플)</div>
-          <div class="alert-hint">
-            기온·습도·강수·풍속을 조합해서 “오늘 어떤 작업을 우선해야 하는지” 제안합니다.
-            (추후 API 연동 시 자동 계산)
-          </div>
-
-          <div class="alert-list">
-            <div class="alert-item">
-              <div class="alert-dot-warn"></div>
-              <div>
-                <div class="alert-main">건조 + 고온 구간</div>
-                <div class="alert-sub">
-                  낮 최고 29°C, 상대습도 40% 이하 예보 → 진딧물·응애 등 흡즙성 해충 증가 가능성 ↑
-                  <br />⇒ 신초·수세 약한 교목 위주로 잎 뒷면 점검, 예방 위주 방제 계획 검토
-                </div>
-              </div>
-            </div>
-
-            <div class="alert-item">
-              <div class="alert-dot-info"></div>
-              <div>
-                <div class="alert-main">장마 + 저온다습</div>
-                <div class="alert-sub">
-                  5일 후 연속 강우·습도 90% 근접 예보 → 균류성 잎마름·가지마름병 발생 가능성
-                  <br />⇒ 통풍 불량 구역(건물 벽면, 흙 표면 피복 많은 곳) 우선 점검
-                </div>
-              </div>
-            </div>
-
-            <div class="alert-item">
-              <div class="alert-dot-high"></div>
-              <div>
-                <div class="alert-main">강풍 예보 · 전도 위험</div>
-                <div class="alert-sub">
-                  4일 후 최대 풍속 9 m/s 이상 예보 → 전도 위험 수목 즉시 목록화
-                  <br />⇒ 사면부·도로변 지주 약한 수목 중심으로 와이어 긴장도·뿌리 들림 현장 점검
-                </div>
-              </div>
-            </div>
-
-            <div class="alert-item">
-              <div class="alert-dot-info"></div>
-              <div>
-                <div class="alert-main">폭우 · 배수 취약 구간</div>
-                <div class="alert-sub">
-                  5일 후 일 강수량 80mm 수준 예보 → 사면부/집수정 주변 배수 상태 체크
-                  <br />⇒ 토양 포화가 예상되는 구역의 고사 위험 수목을 “우선 순찰 리스트”에 자동 등록
-                </div>
-              </div>
-            </div>
-          </div>
-        </article>
-      </aside>
-    </div>
-
-    <!-- ===== 수목 상세 정보/편집 패널 ===== -->
+    <!-- ===== 수목 상세 정보/편집 패널 (기존 기능 유지) ===== -->
     <aside class="tree-detail-panel">
       <div class="tree-detail-header">
         <div id="treeTitle">-</div>
