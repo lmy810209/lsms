@@ -201,6 +201,11 @@
   z-index: 1000;
 }
 
+/* hidden 속성이 있을 때는 어떤 경우에도 보이지 않도록 강제 숨김 */
+.lsms-modal-backdrop[hidden] {
+  display: none !important;
+}
+
 .lsms-modal {
   width: 520px;
   max-width: 90vw;
