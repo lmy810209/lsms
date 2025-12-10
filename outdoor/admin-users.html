@@ -170,9 +170,16 @@
 
             <div id="detailForm" style="width:100%;display:none;">
               <div class="tree-field">
-                <label class="field-label" for="detailId">ID (읽기 전용)</label>
+                <label class="field-label" for="detailId">ID</label>
                 <div class="field-input-wrap">
-                  <input id="detailId" class="field-input" readonly />
+                  <input
+                    id="detailId"
+                    class="field-input"
+                    placeholder="로그인에 사용할 ID"
+                  />
+                </div>
+                <div class="weather-today-meta" style="margin-top:4px;">
+                  중복되지 않는 고유 ID를 입력해 주세요. (예: admin, worker01)
                 </div>
               </div>
 

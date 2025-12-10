@@ -342,8 +342,28 @@ async function initAdminUsersPage() {
   }
 
   function collectDetailForm() {
-    if (state.selectedIndex < 0 || !state.users[state.selectedIndex]) return;
+    if (state.selectedIndex < 0 || !state.users[state.selectedIndex]) {
+      return false;
+    }
     const u = state.users[state.selectedIndex];
+
+    // ID 변경 허용: 비어 있거나 중복이면 저장 불가
+    if (detailId) {
+      const newId = (detailId.value || "").trim();
+      if (!newId) {
+        alert("ID는 비워둘 수 없습니다.");
+        return false;
+      }
+      const duplicate = state.users.some((other, idx) => {
+        if (idx === state.selectedIndex) return false;
+        return (other.id || "") === newId;
+      });
+      if (duplicate) {
+        alert("이미 같은 ID가 존재합니다. 다른 ID를 입력해 주세요.");
+        return false;
+      }
+      u.id = newId;
+    }
 
     if (detailName) u.name = detailName.value.trim();
     if (detailRole) u.role = detailRole.value;
@@ -365,6 +385,8 @@ async function initAdminUsersPage() {
         u.password = pw.trim();
       }
     }
+
+    return true;
   }
 
   async function saveUsersToServer() {
@@ -438,7 +460,8 @@ async function initAdminUsersPage() {
         alert("먼저 좌측에서 계정을 선택해 주세요.");
         return;
       }
-      collectDetailForm();
+      const ok = collectDetailForm();
+      if (!ok) return;
       updatePreview();
       renderTable();
       renderDetail();
