@@ -125,4 +125,30 @@ window.addEventListener("DOMContentLoaded", () => {
       window.updateRiskChart();
     }
   }
+
+  // 5) 사이드바 MAIN 메뉴 클릭 시 레이어/그래프와 연동
+  const navRisk = document.getElementById("navRiskMonitor");
+  const navDisease = document.getElementById("navDiseaseMonitor");
+
+  if (navRisk) {
+    navRisk.addEventListener("click", () => {
+      const btn = document.querySelector('.pill-toggle[data-layer="risk"]');
+      if (btn) btn.click();
+      const riskSection = document.querySelector(".map-shell");
+      if (riskSection && typeof riskSection.scrollIntoView === "function") {
+        riskSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
+  if (navDisease) {
+    navDisease.addEventListener("click", () => {
+      const btn = document.querySelector('.pill-toggle[data-layer="pest"]');
+      if (btn) btn.click();
+      const mapShell = document.querySelector(".map-shell");
+      if (mapShell && typeof mapShell.scrollIntoView === "function") {
+        mapShell.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
 });
