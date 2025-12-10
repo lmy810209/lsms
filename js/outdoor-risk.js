@@ -11,6 +11,10 @@ function computeBaseRisk(tree) {
     : 0;
   const tilt = Number.isFinite(tree.tilt) ? Number(tree.tilt) : 0;
   const soilSlope = Number.isFinite(tree.slope) ? Number(tree.slope) : 0;
+  const health =
+    Number.isFinite(tree.health_score) && tree.health_score != null
+      ? Math.max(0, Math.min(100, Number(tree.health_score)))
+      : 80;
 
   // 1) 수고 점수
   const heightScore = Math.min(h / 20, 1);
@@ -28,6 +32,7 @@ function computeBaseRisk(tree) {
   // 5) 토양 경사
   const slopeScore = Math.min(soilSlope / 30, 1);
 
+  // 6) 수종 계수
   const speciesFactor =
     {
       "소나무": 1.1,
@@ -35,14 +40,32 @@ function computeBaseRisk(tree) {
       "느티나무": 1.0,
     }[tree.species] || 1.0;
 
-  const weighted =
-    0.25 * heightScore +
-    0.2 * slenderScore +
-    0.2 * crownScore +
-    0.2 * tiltScore +
-    0.15 * slopeScore;
+  // 7) 토양 안정도 / 뿌리 이상 여부 계수
+  const soilLabel = tree.soil_stability || tree.drainage || "보통";
+  let soilFactor = 1.0;
+  if (soilLabel === "단단함") soilFactor = 0.9;
+  else if (soilLabel === "연약함") soilFactor = 1.2;
 
-  return Math.min(100, Math.round(weighted * 100 * speciesFactor));
+  const rootLabel =
+    tree.root_condition || (tree.root_lift ? "약간" : "없음");
+  let rootFactor = 1.0;
+  if (rootLabel === "약간") rootFactor = 1.15;
+  else if (rootLabel === "심함") rootFactor = 1.3;
+
+  // 8) 건강 점수 계수 (건강이 나쁠수록 위험도 ↑)
+  const healthFactor = 1.0 + ((100 - health) / 100) * 0.3; // 최대 +30%
+
+  // 9) 기울기/경사 가중치 포함한 기본 점수
+  const weighted =
+    0.22 * heightScore +
+    0.18 * slenderScore +
+    0.18 * crownScore +
+    0.22 * tiltScore +
+    0.20 * slopeScore;
+
+  const factor = speciesFactor * soilFactor * rootFactor * healthFactor;
+
+  return Math.min(100, Math.round(weighted * 100 * factor));
 }
 
 // 2) 실시간 날씨 계수

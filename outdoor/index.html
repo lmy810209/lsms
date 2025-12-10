@@ -317,6 +317,36 @@
                 <span id="detailCrown"></span>
                 <input id="detailCrownInput" type="number" step="0.1" class="details-input hidden" />
               </div>
+            <div class="details-field">
+              <label>사면 경사(°)</label>
+              <span id="detailSlope"></span>
+              <input id="detailSlopeInput" type="number" step="1" class="details-input hidden" />
+            </div>
+            <div class="details-field">
+              <label>수목 기울기(°)</label>
+              <span id="detailTilt"></span>
+              <input id="detailTiltInput" type="number" step="1" class="details-input hidden" />
+            </div>
+            <div class="details-field">
+              <label>토양 안정도</label>
+              <span id="detailSoil"></span>
+              <select id="detailSoilInput" class="details-input hidden">
+                <option value="">선택</option>
+                <option value="단단함">단단함</option>
+                <option value="보통">보통</option>
+                <option value="연약함">연약함</option>
+              </select>
+            </div>
+            <div class="details-field">
+              <label>뿌리 이상 여부</label>
+              <span id="detailRoot"></span>
+              <select id="detailRootInput" class="details-input hidden">
+                <option value="">선택</option>
+                <option value="없음">없음</option>
+                <option value="약간">약간</option>
+                <option value="심함">심함</option>
+              </select>
+            </div>
               <div class="details-field">
                 <label>식재연도</label>
                 <span id="detailYear"></span>
@@ -461,6 +491,32 @@
             <label class="field-inline">
               <span class="field-label-sm">수관폭 (m)</span>
               <input type="number" step="0.1" id="treeAddCrown" class="field-input" placeholder="예: 4.2" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">사면 경사(°)</span>
+              <input type="number" id="treeAddSlope" class="field-input" placeholder="예: 10" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">수목 기울기(°)</span>
+              <input type="number" id="treeAddTilt" class="field-input" placeholder="예: 5" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">토양 안정도</span>
+              <select id="treeAddSoil" class="field-input">
+                <option value="">선택</option>
+                <option value="단단함">단단함</option>
+                <option value="보통">보통</option>
+                <option value="연약함">연약함</option>
+              </select>
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">뿌리 이상 여부</span>
+              <select id="treeAddRoot" class="field-input">
+                <option value="">선택</option>
+                <option value="없음">없음</option>
+                <option value="약간">약간</option>
+                <option value="심함">심함</option>
+              </select>
             </label>
           </div>
           <div class="lsms-modal-footer">

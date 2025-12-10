@@ -33,6 +33,9 @@
         drainage: "보통",
         trunk_crack: false,
         crown_lean: "약함",
+        // 토양/뿌리 상태 (위험도 계산용)
+        soil_stability: "보통", // 단단함 / 보통 / 연약함
+        root_condition: "없음", // 없음 / 약간 / 심함
         risk_base: 37,
         risk_instant: 37,
         risk_level: "LOW",
@@ -77,6 +80,8 @@
         drainage: "불량",
         trunk_crack: false,
         crown_lean: "중간",
+        soil_stability: "연약함",
+        root_condition: "심함",
         risk_base: 62,
         risk_instant: 62,
         risk_level: "MOD",
@@ -121,6 +126,8 @@
         drainage: "양호",
         trunk_crack: false,
         crown_lean: "없음",
+        soil_stability: "단단함",
+        root_condition: "없음",
         risk_base: 20,
         risk_instant: 20,
         risk_level: "LOW",

@@ -38,6 +38,11 @@ function setTreeData(newTrees) {
 
   window.treeData = applied;
   renderTrees();
+
+  // 수목 정보 변경 시 위험도/마커/그래프도 함께 갱신
+  if (typeof window.refreshRiskDashboard === "function") {
+    window.refreshRiskDashboard();
+  }
 }
 
 // 공통 색상 함수 (지도 + 리스트에서 같이 사용)
@@ -70,6 +75,10 @@ let treeAddYearEl = null;
 let treeAddHeightEl = null;
 let treeAddDbhEl = null;
 let treeAddCrownEl = null;
+let treeAddSlopeEl = null;
+let treeAddTiltEl = null;
+let treeAddSoilEl = null;
+let treeAddRootEl = null;
 let pendingAddLat = null;
 let pendingAddLng = null;
 
@@ -107,6 +116,10 @@ function treesInit() {
   treeAddHeightEl = document.getElementById("treeAddHeight");
   treeAddDbhEl = document.getElementById("treeAddDbh");
   treeAddCrownEl = document.getElementById("treeAddCrown");
+  treeAddSlopeEl = document.getElementById("treeAddSlope");
+  treeAddTiltEl = document.getElementById("treeAddTilt");
+  treeAddSoilEl = document.getElementById("treeAddSoil");
+  treeAddRootEl = document.getElementById("treeAddRoot");
 
   // 수목 상세 패널 요소
   detailPanel = document.getElementById("treeDetailsPanel");
@@ -118,6 +131,10 @@ function treesInit() {
       height: document.getElementById("detailHeight"),
       dbh: document.getElementById("detailDbh"),
       crown: document.getElementById("detailCrown"),
+      slope: document.getElementById("detailSlope"),
+      tilt: document.getElementById("detailTilt"),
+      soil: document.getElementById("detailSoil"),
+      root: document.getElementById("detailRoot"),
       year: document.getElementById("detailYear"),
       health: document.getElementById("detailHealth"),
       memo: document.getElementById("detailMemo"),
@@ -129,6 +146,10 @@ function treesInit() {
       height: document.getElementById("detailHeightInput"),
       dbh: document.getElementById("detailDbhInput"),
       crown: document.getElementById("detailCrownInput"),
+      slope: document.getElementById("detailSlopeInput"),
+      tilt: document.getElementById("detailTiltInput"),
+      soil: document.getElementById("detailSoilInput"),
+      root: document.getElementById("detailRootInput"),
       year: document.getElementById("detailYearInput"),
       health: document.getElementById("detailHealthInput"),
       memo: document.getElementById("detailMemoInput"),
@@ -215,6 +236,10 @@ function treesInit() {
           crown_height: t.crown_height,
           planted_year: t.planted_year,
           health_score: t.health_score,
+          slope: t.slope,
+          tilt: t.tilt,
+          soil_stability: t.soil_stability,
+          root_condition: t.root_condition,
           memo: (t.history && t.history.memo) || "",
           lat: t.lat,
           lng: t.lng,
@@ -228,6 +253,16 @@ function treesInit() {
           detailInputs.height.value = t.height ?? "";
         if (detailInputs.dbh) detailInputs.dbh.value = t.dbh ?? "";
         if (detailInputs.crown) detailInputs.crown.value = t.crown ?? "";
+        if (detailInputs.slope)
+          detailInputs.slope.value = t.slope ?? "";
+        if (detailInputs.tilt)
+          detailInputs.tilt.value = t.tilt ?? "";
+        if (detailInputs.soil)
+          detailInputs.soil.value =
+            t.soil_stability || t.drainage || "보통";
+        if (detailInputs.root)
+          detailInputs.root.value =
+            t.root_condition || (t.root_lift ? "약간" : "없음");
         if (detailInputs.year)
           detailInputs.year.value = t.planted_year ?? "";
         if (detailInputs.health)
@@ -270,6 +305,10 @@ function treesInit() {
             t.crown_height = originalTreeDataSnapshot.crown_height;
             t.planted_year = originalTreeDataSnapshot.planted_year;
             t.health_score = originalTreeDataSnapshot.health_score;
+            t.slope = originalTreeDataSnapshot.slope;
+            t.tilt = originalTreeDataSnapshot.tilt;
+            t.soil_stability = originalTreeDataSnapshot.soil_stability;
+            t.root_condition = originalTreeDataSnapshot.root_condition;
             if (!t.history) t.history = {};
             t.history.memo = originalTreeDataSnapshot.memo;
             t.lat = originalTreeDataSnapshot.lat;
@@ -314,6 +353,22 @@ function treesInit() {
           const num = v ? Number(v) : null;
           t.crown = num;
           t.crown_width = num;
+        }
+        if (detailInputs.slope) {
+          const v = detailInputs.slope.value;
+          t.slope = v !== "" ? Number(v) : null;
+        }
+        if (detailInputs.tilt) {
+          const v = detailInputs.tilt.value;
+          t.tilt = v !== "" ? Number(v) : null;
+        }
+        if (detailInputs.soil) {
+          const v = detailInputs.soil.value || "";
+          t.soil_stability = v || null;
+        }
+        if (detailInputs.root) {
+          const v = detailInputs.root.value || "";
+          t.root_condition = v || null;
         }
         if (detailInputs.year) {
           const v = detailInputs.year.value;
@@ -479,11 +534,19 @@ function treesInit() {
       const heightStr = (treeAddHeightEl?.value || "").trim();
       const dbhStr = (treeAddDbhEl?.value || "").trim();
       const crownStr = (treeAddCrownEl?.value || "").trim();
+      const slopeStr = (treeAddSlopeEl?.value || "").trim();
+      const tiltStr = (treeAddTiltEl?.value || "").trim();
+      const soilVal = (treeAddSoilEl?.value || "").trim();
+      const rootVal = (treeAddRootEl?.value || "").trim();
 
       const plantedYear = yearStr ? Number(yearStr) : null;
       const height = heightStr ? Number(heightStr) : null;
       const dbh = dbhStr ? Number(dbhStr) : null;
       const crown = crownStr ? Number(crownStr) : null;
+      const slope = slopeStr ? Number(slopeStr) : null;
+      const tilt = tiltStr ? Number(tiltStr) : null;
+      const soil_stability = soilVal || null;
+      const root_condition = rootVal || null;
 
       const today = new Date().toISOString().slice(0, 10);
 
@@ -505,12 +568,14 @@ function treesInit() {
         crown_width: crown,
         crown_height: null,
         planted_year: plantedYear,
-        slope: null,
-        tilt: null,
-        root_lift: false,
-        drainage: "",
+        slope,
+        tilt,
+        root_lift: root_condition === "약간" || root_condition === "심함",
+        drainage: soil_stability || "",
         trunk_crack: false,
         crown_lean: "",
+        soil_stability,
+        root_condition,
         risk_base: 0,
         risk_instant: 0,
         risk_level: "LOW",
@@ -757,6 +822,10 @@ function addTree(lat, lng) {
   if (treeAddHeightEl) treeAddHeightEl.value = "";
   if (treeAddDbhEl) treeAddDbhEl.value = "";
   if (treeAddCrownEl) treeAddCrownEl.value = "";
+  if (treeAddSlopeEl) treeAddSlopeEl.value = "";
+  if (treeAddTiltEl) treeAddTiltEl.value = "";
+  if (treeAddSoilEl) treeAddSoilEl.value = "";
+  if (treeAddRootEl) treeAddRootEl.value = "";
 
   treeAddModal.hidden = false;
   setAddMode(false);
@@ -803,6 +872,25 @@ function openTreeDetailPanel(tree, mode = "view") {
         ? tree.crown
         : null;
     detailSpans.crown.textContent = cw != null ? cw + " m" : "-";
+  }
+  if (detailSpans.slope) {
+    const v =
+      Number.isFinite(tree.slope) && tree.slope != null ? Number(tree.slope) : null;
+    detailSpans.slope.textContent = v != null ? v + "°" : "-";
+  }
+  if (detailSpans.tilt) {
+    const v =
+      Number.isFinite(tree.tilt) && tree.tilt != null ? Number(tree.tilt) : null;
+    detailSpans.tilt.textContent = v != null ? v + "°" : "-";
+  }
+  if (detailSpans.soil) {
+    const label = tree.soil_stability || tree.drainage || "-";
+    detailSpans.soil.textContent = label;
+  }
+  if (detailSpans.root) {
+    const label =
+      tree.root_condition || (tree.root_lift ? "약간" : "없음");
+    detailSpans.root.textContent = label || "-";
   }
   if (detailSpans.year)
     detailSpans.year.textContent =
