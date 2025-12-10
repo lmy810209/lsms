@@ -247,7 +247,7 @@
           </section>
         </div>
 
-        <!-- 오른쪽: 날씨 패널 -->
+        <!-- 오른쪽: 날씨 패널 + 수목 상세 패널 컬럼 -->
         <aside class="right-panel" id="weatherPanel">
           <article class="card">
             <div class="weather-card-header">
@@ -279,68 +279,68 @@
               <!-- 자바스크립트에서 자동으로 행(row)들을 채워 넣음 -->
             </div>
           </article>
-        </aside>
-      </div>
 
-      <!-- ===== 수목 상세 패널 (지도 오른쪽 고정) ===== -->
-      <div id="treeDetailsPanel" class="details-panel hidden">
-        <div class="details-header">
-          <div class="details-title">수목 상세 정보</div>
-          <button type="button" class="details-close-btn" id="btnCloseTreeDetails">×</button>
-        </div>
-        <div class="details-body">
-          <div class="details-field">
-            <label>수목 ID</label>
-            <span id="detailTreeId"></span>
-            <input id="detailTreeIdInput" class="details-input hidden" readonly />
+          <!-- 수목 상세 패널: 날씨 카드 아래쪽에 세로 컬럼으로 배치 -->
+          <div id="treeDetailsPanel" class="details-panel hidden">
+            <div class="details-header">
+              <div class="details-title">수목 상세 정보</div>
+              <button type="button" class="details-close-btn" id="btnCloseTreeDetails">×</button>
+            </div>
+            <div class="details-body">
+              <div class="details-field">
+                <label>수목 ID</label>
+                <span id="detailTreeId"></span>
+                <input id="detailTreeIdInput" class="details-input hidden" readonly />
+              </div>
+              <div class="details-field">
+                <label>수종명</label>
+                <span id="detailSpecies"></span>
+                <input id="detailSpeciesInput" class="details-input hidden" />
+              </div>
+              <div class="details-field">
+                <label>구역</label>
+                <span id="detailZone"></span>
+                <input id="detailZoneInput" class="details-input hidden" />
+              </div>
+              <div class="details-field">
+                <label>수고(H)</label>
+                <span id="detailHeight"></span>
+                <input id="detailHeightInput" type="number" step="0.1" class="details-input hidden" />
+              </div>
+              <div class="details-field">
+                <label>흉고 직경</label>
+                <span id="detailDbh"></span>
+                <input id="detailDbhInput" type="number" step="0.1" class="details-input hidden" />
+              </div>
+              <div class="details-field">
+                <label>수관 폭</label>
+                <span id="detailCrown"></span>
+                <input id="detailCrownInput" type="number" step="0.1" class="details-input hidden" />
+              </div>
+              <div class="details-field">
+                <label>식재연도</label>
+                <span id="detailYear"></span>
+                <input id="detailYearInput" type="number" class="details-input hidden" />
+              </div>
+              <div class="details-field">
+                <label>건강 점수</label>
+                <span id="detailHealth"></span>
+                <input id="detailHealthInput" type="number" class="details-input hidden" />
+              </div>
+              <div class="details-field details-field-memo">
+                <label>메모</label>
+                <span id="detailMemo"></span>
+                <textarea id="detailMemoInput" rows="3" class="details-input hidden"></textarea>
+              </div>
+            </div>
+            <div class="details-footer">
+              <button id="btnEditTree" type="button" class="btn btn-sm btn-ghost">편집</button>
+              <button id="btnSaveTree" type="button" class="btn btn-sm btn-primary hidden">저장</button>
+              <button id="btnCancelEdit" type="button" class="btn btn-sm btn-ghost hidden">취소</button>
+              <button id="btnDeleteTree" type="button" class="btn btn-sm btn-ghost details-danger">삭제</button>
+            </div>
           </div>
-          <div class="details-field">
-            <label>수종명</label>
-            <span id="detailSpecies"></span>
-            <input id="detailSpeciesInput" class="details-input hidden" />
-          </div>
-          <div class="details-field">
-            <label>구역</label>
-            <span id="detailZone"></span>
-            <input id="detailZoneInput" class="details-input hidden" />
-          </div>
-          <div class="details-field">
-            <label>수고(H)</label>
-            <span id="detailHeight"></span>
-            <input id="detailHeightInput" type="number" step="0.1" class="details-input hidden" />
-          </div>
-          <div class="details-field">
-            <label>흉고 직경</label>
-            <span id="detailDbh"></span>
-            <input id="detailDbhInput" type="number" step="0.1" class="details-input hidden" />
-          </div>
-          <div class="details-field">
-            <label>수관 폭</label>
-            <span id="detailCrown"></span>
-            <input id="detailCrownInput" type="number" step="0.1" class="details-input hidden" />
-          </div>
-          <div class="details-field">
-            <label>식재연도</label>
-            <span id="detailYear"></span>
-            <input id="detailYearInput" type="number" class="details-input hidden" />
-          </div>
-          <div class="details-field">
-            <label>건강 점수</label>
-            <span id="detailHealth"></span>
-            <input id="detailHealthInput" type="number" class="details-input hidden" />
-          </div>
-          <div class="details-field details-field-memo">
-            <label>메모</label>
-            <span id="detailMemo"></span>
-            <textarea id="detailMemoInput" rows="3" class="details-input hidden"></textarea>
-          </div>
-        </div>
-        <div class="details-footer">
-          <button id="btnEditTree" type="button" class="btn btn-sm btn-ghost">편집</button>
-          <button id="btnSaveTree" type="button" class="btn btn-sm btn-primary hidden">저장</button>
-          <button id="btnCancelEdit" type="button" class="btn btn-sm btn-ghost hidden">취소</button>
-          <button id="btnDeleteTree" type="button" class="btn btn-sm btn-ghost details-danger">삭제</button>
-        </div>
+        </aside>
       </div>
     </section>
 
