@@ -4,23 +4,36 @@
 function computeBaseRisk(tree) {
   const h = Number.isFinite(tree.height) ? Number(tree.height) : 0;
   const dbh = Number.isFinite(tree.dbh) ? Number(tree.dbh) : 0.0001;
-  const crown = Number.isFinite(tree.crown_width) ? Number(tree.crown_width) : (Number.isFinite(tree.crown) ? Number(tree.crown) : 0);
+  const crown = Number.isFinite(tree.crown_width)
+    ? Number(tree.crown_width)
+    : Number.isFinite(tree.crown)
+    ? Number(tree.crown)
+    : 0;
   const tilt = Number.isFinite(tree.tilt) ? Number(tree.tilt) : 0;
-  const slope = Number.isFinite(tree.slope) ? Number(slope) : 0;
+  const soilSlope = Number.isFinite(tree.slope) ? Number(tree.slope) : 0;
 
+  // 1) 수고 점수
   const heightScore = Math.min(h / 20, 1);
+
+  // 2) 세장비 (높이/직경)
   const slender = h / (dbh / 100);
   const slenderScore = Math.min(slender / 80, 1);
+
+  // 3) 수관 크기
   const crownScore = Math.min(crown / 10, 1);
+
+  // 4) 나무 기울기
   const tiltScore = Math.min(tilt / 45, 1);
-  const slopeScore = Math.min(slope / 30, 1);
+
+  // 5) 토양 경사
+  const slopeScore = Math.min(soilSlope / 30, 1);
 
   const speciesFactor =
     {
       "소나무": 1.1,
       "은행나무": 0.8,
       "느티나무": 1.0,
-    }[tree.species] ?? 1.0;
+    }[tree.species] || 1.0;
 
   const weighted =
     0.25 * heightScore +
@@ -29,8 +42,7 @@ function computeBaseRisk(tree) {
     0.2 * tiltScore +
     0.15 * slopeScore;
 
-  const baseScore = Math.min(100, Math.round(weighted * 100 * speciesFactor));
-  return baseScore;
+  return Math.min(100, Math.round(weighted * 100 * speciesFactor));
 }
 
 // 2) 실시간 날씨 계수
