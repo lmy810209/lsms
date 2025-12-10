@@ -439,6 +439,60 @@
         </div>
       </article>
     </section>
+
+    <!-- ===== 새 수목 등록 모달 ===== -->
+    <div class="lsms-modal-backdrop" id="treeAddModal" hidden>
+      <div class="lsms-modal">
+        <div class="lsms-modal-header">
+          <h2 class="lsms-modal-title">새 수목 등록</h2>
+          <button type="button" class="lsms-modal-close" id="treeAddModalClose">×</button>
+        </div>
+        <div class="lsms-modal-body">
+          <div class="lsms-modal-grid">
+            <label class="field-inline">
+              <span class="field-label-sm">수목 ID</span>
+              <input type="text" id="treeAddId" class="field-input" placeholder="예: YA-010" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">수종명</span>
+              <input type="text" id="treeAddSpecies" class="field-input" placeholder="예: 소나무" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">구역</span>
+              <select id="treeAddZone" class="field-input">
+                <option value="">선택하세요</option>
+                <option value="A존">A존 · 사면부</option>
+                <option value="B존">B존 · 도로변</option>
+                <option value="C존">C존 · 광장·보행동선</option>
+              </select>
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">식재연도</span>
+              <input type="number" id="treeAddYear" class="field-input" placeholder="예: 2018" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">수고(H) (m)</span>
+              <input type="number" step="0.1" id="treeAddHeight" class="field-input" placeholder="예: 6.5" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">흉고직경(DBH) (cm)</span>
+              <input type="number" step="0.1" id="treeAddDbh" class="field-input" placeholder="예: 25" />
+            </label>
+            <label class="field-inline">
+              <span class="field-label-sm">수관폭 (m)</span>
+              <input type="number" step="0.1" id="treeAddCrown" class="field-input" placeholder="예: 4.2" />
+            </label>
+          </div>
+          <div class="lsms-modal-footer">
+            <button type="button" class="btn btn-sm btn-ghost" id="treeAddCancel">취소</button>
+            <button type="button" class="btn btn-sm btn-primary" id="treeAddSubmit">등록</button>
+          </div>
+          <p class="lsms-modal-help">
+            지도에서 선택한 위치에 새 수목이 등록됩니다. (관리자 전용 기능)
+          </p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- ========== JS 로딩 (OUTDOOR 전용) ========== -->
