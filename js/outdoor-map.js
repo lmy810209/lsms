@@ -108,180 +108,11 @@ function renderTreesOnMap() {
     const marker = L.marker([tree.lat, tree.lng], { icon }).addTo(markerLayer);
     markersById[tree.id] = marker;
 
-    const diseaseText = tree.disease?.has_issue ? "있음" : "없음";
-
-    let badgeClass = "good";
-    let healthLabel = "건강 양호";
-    const score = typeof tree.health_score === "number" ? tree.health_score : null;
-    if (score !== null) {
-      if (score < 60) {
-        badgeClass = "bad";
-        healthLabel = "주의 필요";
-      } else if (score < 80) {
-        badgeClass = "warn";
-        healthLabel = "경계";
-      }
-    }
-
-    const popupHTML = `
-      <div class="tree-popup">
-        <div class="tree-popup-header">
-          <div>
-            <div class="tree-popup-id">${tree.id}</div>
-            <div class="tree-popup-name">${tree.species || "-"}</div>
-            <div class="tree-popup-meta">
-              ${tree.zone || "-"} · ${tree.type || "-"} · 상태 ${tree.status || "-"}
-            </div>
-          </div>
-          <div class="tree-popup-badge tree-popup-badge--${badgeClass}">
-            ${healthLabel}
-          </div>
-        </div>
-
-        <div class="tree-popup-tabs">
-          <div class="tree-popup-tab is-active" data-tab="basic">생육 정보</div>
-          <div class="tree-popup-tab" data-tab="risk">전도 위험</div>
-          <div class="tree-popup-tab" data-tab="disease">병해충 이력</div>
-          <div class="tree-popup-tab" data-tab="tag">태그·센서</div>
-          <div class="tree-popup-tab" data-tab="manage">최근 관리</div>
-          <div class="tree-popup-tab" data-tab="photo">사진·메모</div>
-        </div>
-
-        <div class="tree-popup-section" data-tab-panel="basic">
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">수고(H)</span>
-            <span class="tree-popup-row-value">${tree.height ?? "-"} m</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">흉고 직경</span>
-            <span class="tree-popup-row-value">${tree.dbh ?? "-"} cm</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">수관폭</span>
-            <span class="tree-popup-row-value">${tree.crown ?? "-"} m</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">식재연도</span>
-            <span class="tree-popup-row-value">${tree.planted_year ?? "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">건강도 점수</span>
-            <span class="tree-popup-row-value">${tree.health_score ?? "-"}</span>
-          </div>
-        </div>
-
-        <div class="tree-popup-section" data-tab-panel="risk" style="display:none;">
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">위험 등급</span>
-            <span class="tree-popup-row-value">${tree.risk_level || "-"} (점수 ${tree.risk_score ?? "-"})</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">경사도</span>
-            <span class="tree-popup-row-value">${tree.slope ?? "-"} %</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">수간 기울기</span>
-            <span class="tree-popup-row-value">${tree.tilt ?? "-"} °</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">뿌리 들림</span>
-            <span class="tree-popup-row-value">${tree.root_lift ? "있음" : "없음"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">배수 상태</span>
-            <span class="tree-popup-row-value">${tree.drainage || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">수간 균열</span>
-            <span class="tree-popup-row-value">${tree.trunk_crack ? "있음" : "없음"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">수관 편중</span>
-            <span class="tree-popup-row-value">${tree.crown_lean || "-"}</span>
-          </div>
-        </div>
-
-        <div class="tree-popup-section" data-tab-panel="disease" style="display:none;">
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">피해 발생 여부</span>
-            <span class="tree-popup-row-value">${diseaseText}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">최근 발생일</span>
-            <span class="tree-popup-row-value">${tree.disease?.last_date || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">상세</span>
-            <span class="tree-popup-row-value">${tree.disease?.detail || "-"}</span>
-          </div>
-        </div>
-
-        <div class="tree-popup-section" data-tab-panel="tag" style="display:none;">
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">RFID tag</span>
-            <span class="tree-popup-row-value">${tree.tag_id || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">NFC ID</span>
-            <span class="tree-popup-row-value">${tree.nfc_id || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">QR 코드 ID</span>
-            <span class="tree-popup-row-value">${tree.qr_id || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">센서 ID</span>
-            <span class="tree-popup-row-value">${tree.sensor_id || "-"}</span>
-          </div>
-        </div>
-
-        <div class="tree-popup-section" data-tab-panel="manage" style="display:none;">
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">전정</span>
-            <span class="tree-popup-row-value">${tree.history?.pruning || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">방제</span>
-            <span class="tree-popup-row-value">${tree.history?.pest || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">시비</span>
-            <span class="tree-popup-row-value">${tree.history?.fertilize || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">점검</span>
-            <span class="tree-popup-row-value">${tree.history?.inspection || "-"}</span>
-          </div>
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">메모</span>
-            <span class="tree-popup-row-value">${tree.history?.memo || "-"}</span>
-          </div>
-        </div>
-
-        <div class="tree-popup-section" data-tab-panel="photo" style="display:none;">
-          ${
-            tree.photo_url
-              ? `<img src="${tree.photo_url}" alt="현장 사진" style="width:100%;border-radius:8px;margin-bottom:4px;">`
-              : `<div class="tree-popup-row"><span class="tree-popup-row-label">사진</span><span class="tree-popup-row-value">등록된 사진이 없습니다.</span></div>`
-          }
-          <div class="tree-popup-row">
-            <span class="tree-popup-row-label">작성</span>
-            <span class="tree-popup-row-value">${tree.created_by || "-"} / 최초등록 ${tree.created_at || "-"} / 최종수정 ${tree.updated_at || "-"}</span>
-          </div>
-        </div>
-      </div>
-    `;
-
-    marker.bindPopup(popupHTML, {
-      maxWidth: 320,
-      className: "tree-popup-wrapper",
-      autoPan: true,
-      autoPanPadding: [40, 80]
-    });
-
     marker.on("click", () => {
       map.setView([tree.lat, tree.lng], 18, { animate: true });
-      marker.openPopup();
+      if (typeof openTreeDetailPanel === "function") {
+        openTreeDetailPanel(tree, "view");
+      }
     });
   });
 }
@@ -293,7 +124,9 @@ function focusTree(treeId) {
   const marker = markersById[treeId];
   if (!tree || !marker || !map) return;
   map.setView([tree.lat, tree.lng], 18, { animate: true });
-  marker.openPopup();
+  if (typeof openTreeDetailPanel === "function") {
+    openTreeDetailPanel(tree, "view");
+  }
 }
 
 // 팝업 탭 버튼 전역 처리
