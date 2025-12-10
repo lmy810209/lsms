@@ -3,6 +3,9 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
+// (선택) 로그 기록 유틸이 있다면 불러온다.
+@require_once __DIR__ . '/log-helper.php';
+
 try {
     $raw = file_get_contents('php://input');
     if ($raw === false) {
@@ -54,8 +57,24 @@ try {
         if ($u['id'] !== $id) {
             continue;
         }
-        // demo: 평문 비밀번호 비교 (운영용으로는 적합하지 않음)
-        if ($u['password'] !== $pw) {
+
+        // 비밀번호 비교 (해시 또는 평문 둘 다 지원)
+        $storedPw = (string)$u['password'];
+        $passwordOk = false;
+
+        // bcrypt 해시로 보이는 경우
+        if ($storedPw !== '' && strpos($storedPw, '$2y$') === 0) {
+            if (password_verify($pw, $storedPw)) {
+                $passwordOk = true;
+            }
+        } else {
+            // 구(舊) demo 방식: 평문 비교 (향후 완전히 제거 예정)
+            if ($storedPw === $pw) {
+                $passwordOk = true;
+            }
+        }
+
+        if (!$passwordOk) {
             continue;
         }
 
@@ -92,6 +111,16 @@ try {
         'site'  => $site ?: (isset($found['site']) ? $found['site'] : null),
         'scope' => $scope,
     ];
+
+    // 로그인 로그 남기기 (가능한 경우)
+    if (function_exists('lsms_append_log')) {
+        $clientIp = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+        lsms_append_log('login', $userInfo['id'], [
+            'site'  => $userInfo['site'],
+            'scope' => $userInfo['scope'],
+            'ip'    => $clientIp,
+        ]);
+    }
 
     echo json_encode(
         ['ok' => true, 'user' => $userInfo],

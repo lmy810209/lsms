@@ -67,3 +67,9 @@
 .admin-users-row-selected {
   background: #eff6ff;
 }
+
+/* 관리자 전용 사이드바 보조 스타일 */
+.nav-item.nav-item-disabled {
+  opacity: 0.4;
+  cursor: default;
+}

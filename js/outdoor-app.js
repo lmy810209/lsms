@@ -42,6 +42,11 @@ let CURRENT_USER_ROLE = "guest";
   window.LSMS_USER = user;
   CURRENT_USER_ROLE = user.role || "guest";
 
+  // OUTDOOR 상태 모듈에도 현재 권한을 전달 (있을 경우)
+  if (window.LSMS && window.LSMS.outdoor) {
+    window.LSMS.outdoor.userRole = CURRENT_USER_ROLE;
+  }
+
   window.addEventListener("DOMContentLoaded", () => {
     // 상단 상태 표시 업데이트
     const userLabel = document.getElementById("outdoorUserLabel");

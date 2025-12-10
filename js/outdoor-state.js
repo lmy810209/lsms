@@ -1,6 +1,6 @@
 // js/outdoor-state.js
 // LSMS OUTDOOR 상태 모듈
-// - userRole: 현재 사용자 권한 (기본값 'admin')
+// - userRole: 현재 사용자 권한 (기본값 'guest', app.js에서 로그인 후 덮어씀)
 // - trees: 실외 수목 데이터 (기존 outdoor-trees.js 의 treeData 초기값)
 // - getTrees(), setTrees(), isAdmin() 헬퍼 제공
 
@@ -9,7 +9,7 @@
     const outdoor = (LSMS.outdoor = LSMS.outdoor || {});
   
     // 1) 현재 사용자 권한 (추후 인증 모듈에서 변경 가능)
-    outdoor.userRole = "admin"; // 'admin' | 'worker' | 'guest' 등
+    outdoor.userRole = "guest"; // 'admin' | 'worker' | 'guest' 등
   
     // 2) 실외 수목 데이터 (기존 treeData 그대로 이동)
     outdoor.trees = [

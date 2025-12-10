@@ -11,62 +11,57 @@
   <!-- 관리자 전용 JS -->
   <script src="/js/outdoor-admin-users.js" defer></script>
 </head>
-<body>
+  <body>
 
-  <!-- ========== 사이드바 ========== -->
+  <!-- ========== 사이드바 (관리자 전용) ========== -->
   <aside class="sidebar">
     <div class="side-header">
       <div class="side-logo">LS</div>
       <div class="side-title">
         <div class="side-title-main">LSMS OUTDOOR</div>
-        <div class="side-title-sub">Hyundai · Yangjae HQ</div>
+        <div class="side-title-sub">ADMIN CONSOLE</div>
       </div>
     </div>
 
-    <div class="side-section-label">MAIN</div>
+    <div class="side-section-label">ADMIN</div>
     <ul class="nav-list">
-      <li class="nav-item">
-        <a href="/outdoor/index.html" class="nav-link">
-          <div class="nav-icon-round">🏙</div>
-          <div class="nav-label-wrap">
-            <span class="nav-label-main">양재HQ 실외조경 현황</span>
-            <span class="nav-label-sub">지도 · 전도 위험 · 병해충 요약</span>
-          </div>
-        </a>
-      </li>
-      <!-- 관리자 메뉴 -->
       <li class="nav-item active">
-        <a href="/outdoor/admin-users.html" class="nav-link">
-          <div class="nav-icon-round">👤</div>
-          <div class="nav-label-wrap">
-            <span class="nav-label-main">계정 관리(관리자)</span>
-            <span class="nav-label-sub">관리자 · 작업자 계정 발급·편집</span>
-          </div>
-        </a>
+        <div class="nav-icon-round">👤</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">계정 관리</span>
+          <span class="nav-label-sub">관리자 · 작업자 계정 발급·편집</span>
+        </div>
+      </li>
+      <li class="nav-item nav-item-disabled">
+        <div class="nav-icon-round">📋</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">작업자 조회</span>
+          <span class="nav-label-sub">현장별 작업자 목록 (준비중)</span>
+        </div>
+      </li>
+      <li class="nav-item nav-item-disabled">
+        <div class="nav-icon-round">🕒</div>
+        <div class="nav-label-wrap">
+          <span class="nav-label-main">로그 기록</span>
+          <span class="nav-label-sub">로그인/계정 변경 이력 (준비중)</span>
+        </div>
       </li>
     </ul>
 
-    <div class="side-section-label">DATA</div>
+    <div class="side-section-label">시스템</div>
     <ul class="nav-list">
-      <li class="nav-item">
-        <div class="nav-icon-round">💧</div>
+      <li class="nav-item nav-item-disabled">
+        <div class="nav-icon-round">⚙</div>
         <div class="nav-label-wrap">
-          <span class="nav-label-main">관수 기록</span>
-          <span class="nav-label-sub">구역/수목별 급수량 데이터</span>
-        </div>
-      </li>
-      <li class="nav-item">
-        <div class="nav-icon-round">🌡</div>
-        <div class="nav-label-wrap">
-          <span class="nav-label-main">환경 센서</span>
-          <span class="nav-label-sub">온도·강수·바람·토양 정보</span>
+          <span class="nav-label-main">users.json 설정</span>
+          <span class="nav-label-sub">고급 설정 (추후 별도 화면)</span>
         </div>
       </li>
     </ul>
 
     <div class="side-footer">
-      <div class="side-footer-top">LMY · Site Manager</div>
-      <div>ADMIN · OUTDOOR USERS</div>
+      <div class="side-footer-top">관리자 전용 화면</div>
+      <div>LSMS OUTDOOR ADMIN</div>
     </div>
   </aside>
 
@@ -102,10 +97,7 @@
           <div class="card-header">
             <div>
               <div class="card-title">사용자 계정 목록</div>
-              <div class="card-sub">
-                아이디/이름·역할·현장·권한·활성 여부를 한 눈에 보고 관리하는 영역입니다.
-                아이디/이름·역할·현장·권한·상태를 한 번에 확인할 수 있습니다.
-              </div>
+              <div class="card-sub">아이디/이름·역할·현장·권한·상태를 한 번에 확인할 수 있습니다.</div>
             </div>
             <button class="metric-badge-ok" id="addUserBtn">+ 사용자 추가</button>
           </div>
@@ -140,7 +132,7 @@
                   <th style="width:14%">현장</th>
                   <th style="width:20%">권한</th>
                   <th style="width:10%">상태</th>
-                  <th style="width:10%">임시 비밀번호</th>
+                  <th style="width:10%">비밀번호</th>
                 </tr>
               </thead>
               <tbody id="userTableBody">
@@ -238,7 +230,7 @@
               </div>
 
               <div class="tree-field">
-                <label class="field-label" for="detailPassword">비밀번호 초기화</label>
+                <label class="field-label" for="detailPassword">비밀번호</label>
                 <div class="field-input-wrap">
                   <input
                     id="detailPassword"
@@ -262,30 +254,7 @@
       </aside>
     </section>
 
-    <!-- 하단: 고급 설정 · users.json 원본 보기 -->
-    <section class="bottom-grid" style="margin-top:16px;">
-      <article class="card">
-        <details>
-          <summary class="weather-title" style="cursor:pointer;">
-            ▼ 고급 설정 · users.json 원본 보기
-          </summary>
-
-          <div class="weather-today" style="align-items:flex-start;margin-top:8px;">
-            <textarea
-              id="usersJsonPreview"
-              style="width:100%;height:220px;border-radius:10px;border:1px solid #e5e7eb;font-size:11px;font-family:Menlo,Consolas,monospace;padding:8px;resize:vertical;"
-            ></textarea>
-          </div>
-
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
-            <div class="weather-today-meta">
-              ※ demo 환경입니다. 비밀번호는 평문으로 저장되며, 운영 환경에서는 해시 기반으로 변경해야 합니다.
-            </div>
-            <button class="metric-badge-ok" id="saveUsersJsonBtn">JSON 수정 내용 서버에 저장</button>
-          </div>
-        </details>
-      </article>
-    </section>
+    <!-- 하단 고급 설정 영역은 관리자 콘솔을 단순하게 유지하기 위해 일단 숨김 처리 -->
   </main>
 </body>
 </html>

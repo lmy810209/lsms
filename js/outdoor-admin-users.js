@@ -391,10 +391,15 @@ async function initAdminUsersPage() {
 
   async function saveUsersToServer() {
     try {
+      const payload = {
+        users: state.users,
+        actorId: (currentUser && currentUser.id) || "admin",
+      };
+
       const res = await fetch("/api/users-save.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(state.users),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {

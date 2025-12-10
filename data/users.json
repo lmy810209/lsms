@@ -4,7 +4,7 @@
     "name": "사이트 관리자",
     "password": "1234",
     "role": "admin",
-    "site": "yangjae",
+    "site": "*",
     "scopes": ["indoor", "outdoor"],
     "active": true
   },
