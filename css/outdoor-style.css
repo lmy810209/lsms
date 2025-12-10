@@ -15,3 +15,55 @@
 .sidebar .nav-link:visited {
   color: inherit;          /* 방문한 링크도 같은 색 */
 }
+
+/* === OUTDOOR 계정 관리 전용 보조 스타일 === */
+.admin-users-layout {
+  align-items: flex-start;
+}
+
+.admin-users-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.admin-users-filters input,
+.admin-users-filters select {
+  min-width: 120px;
+  max-width: 180px;
+}
+
+.admin-users-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #4b5563;
+  margin-right: 4px;
+}
+
+.admin-users-pill--primary {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.admin-users-pill--success {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.admin-users-pill--muted {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #6b7280;
+}
+
+.admin-users-row-selected {
+  background: #eff6ff;
+}
