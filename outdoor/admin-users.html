@@ -104,6 +104,7 @@
               <div class="card-title">사용자 계정 목록</div>
               <div class="card-sub">
                 아이디/이름·역할·현장·권한·활성 여부를 한 눈에 보고 관리하는 영역입니다.
+                아이디/이름·역할·현장·권한·상태를 한 번에 확인할 수 있습니다.
               </div>
             </div>
             <button class="metric-badge-ok" id="addUserBtn">+ 사용자 추가</button>
@@ -114,7 +115,7 @@
             <input
               id="filterSearch"
               class="risk-input"
-              placeholder="아이디/이름 검색..."
+              placeholder="검색 (아이디/이름)"
             />
             <select id="filterRole" class="risk-input">
               <option value="all">역할: 전체</option>
@@ -124,6 +125,8 @@
             <select id="filterSite" class="risk-input">
               <option value="all">현장: 전체</option>
               <option value="yangjae">양재 HQ</option>
+              <option value="gangnam">강남사옥</option>
+              <option value="future">미래 사업장(준비중)</option>
             </select>
           </div>
 
@@ -137,7 +140,7 @@
                   <th style="width:14%">현장</th>
                   <th style="width:20%">권한</th>
                   <th style="width:10%">상태</th>
-                  <th style="width:10%">관리</th>
+                  <th style="width:10%">임시 비밀번호</th>
                 </tr>
               </thead>
               <tbody id="userTableBody">
@@ -206,6 +209,14 @@
                   <label class="weather-today-meta" style="display:flex;align-items:center;gap:4px;">
                     <input type="checkbox" id="detailScopeOutdoor" /> 실외(OUTDOOR)
                   </label>
+                </div>
+                <div class="field-input-wrap" style="gap:8px;margin-top:6px;">
+                  <button type="button" id="presetOutdoorOnly" class="metric-badge-ok">
+                    OUTDOOR만
+                  </button>
+                  <button type="button" id="presetIndoorOutdoor" class="metric-badge-ok">
+                    실내+실외
+                  </button>
                 </div>
               </div>
 
