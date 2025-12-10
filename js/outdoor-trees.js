@@ -947,10 +947,19 @@ async function loadTreesFromServer() {
 
 async function saveTreesToServer() {
   try {
+    const source = getTreeData();
+    const plainTrees = Array.isArray(source)
+      ? source.map((t) => {
+          // Leaflet 마커 등 순환 참조 가능한 객체는 제거
+          const { marker, ...rest } = t || {};
+          return rest;
+        })
+      : [];
+
     const res = await fetch("/api/trees-save.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(getTreeData()),
+      body: JSON.stringify(plainTrees),
     });
 
     const text = await res.text();
