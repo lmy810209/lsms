@@ -159,7 +159,7 @@
     <!-- 지도 + 필터 영역 + 날씨 패널 (좌: 지도, 우: 날씨) -->
     <div class="layout-grid">
       <div class="left-main">
-        <section class="map-shell">
+        <section class="map-shell" id="mapSection">
           <header class="map-shell-header">
             <div>
               <h2 class="map-shell-title">실외조경 지도 · 전도 위험 · 병해충 포인트</h2>
@@ -281,6 +281,65 @@
         </article>
       </aside>
     </div>
+
+    <!-- 위험/병해충 그래프 영역 -->
+    <section class="bottom-grid" style="margin-top:16px;" id="graphSection">
+      <!-- 전도 위험 그래프 -->
+      <article class="card" id="riskGraphSection">
+        <div class="card-header">
+          <div>
+            <div class="card-title">실외 수목 전도 위험 지수 요약</div>
+            <div class="card-sub">
+              구역별 전도 위험 지수(0~100)를 평균값으로 요약해서, 어디를 먼저 점검해야 하는지 한눈에 보여줍니다.
+            </div>
+          </div>
+          <div style="font-size:11px; color:#6b7280;">단위: 위험 지수 (0~100, 높을수록 위험)</div>
+        </div>
+
+        <div class="card-tag-row" style="margin-bottom:8px;">
+          <span class="card-tag"><span class="tag-color tag-blue"></span>사면부(A존)</span>
+          <span class="card-tag"><span class="tag-color tag-red"></span>도로변(B존)</span>
+          <span class="card-tag"><span class="tag-color tag-orange"></span>광장·보행동선(C존)</span>
+        </div>
+
+        <div class="chart-area">
+          <div style="width:92%; height:86%; display:flex; flex-direction:column;">
+            <canvas id="riskChart" style="flex:1 1 auto;"></canvas>
+            <div style="font-size:11px; color:#6b7280; margin-top:6px;">
+              ※ treeData 기준, 구역별 전도 위험 지수 평균값입니다.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 병해충 그래프 -->
+      <article class="card" id="diseaseGraphSection">
+        <div class="card-header">
+          <div>
+            <div class="card-title">병해충·수세 이상 의심 수목 분포</div>
+            <div class="card-sub">
+              each zone에서 병해충·고사 의심 수목 개수를 집계해, 어디를 우선 점검해야 할지 보여줍니다.
+            </div>
+          </div>
+          <div style="font-size:11px; color:#6b7280;">단위: 의심 개체 수(본)</div>
+        </div>
+
+        <div class="card-tag-row" style="margin-bottom:8px;">
+          <span class="card-tag"><span class="tag-color tag-blue"></span>사면부(A존)</span>
+          <span class="card-tag"><span class="tag-color tag-red"></span>도로변(B존)</span>
+          <span class="card-tag"><span class="tag-color tag-orange"></span>광장·보행동선(C존)</span>
+        </div>
+
+        <div class="chart-area">
+          <div style="width:92%; height:86%; display:flex; flex-direction:column;">
+            <canvas id="diseaseChart" style="flex:1 1 auto;"></canvas>
+            <div style="font-size:11px; color:#6b7280; margin-top:6px;">
+              ※ treeData 기준, 병해충·고사 의심 수목 개수를 구역별로 집계한 값입니다.
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
 
     <!-- ===== 수목 상세 정보/편집 패널 (기존 기능 유지) ===== -->
     <aside class="tree-detail-panel">

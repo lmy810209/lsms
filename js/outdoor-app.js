@@ -134,9 +134,12 @@ window.addEventListener("DOMContentLoaded", () => {
     navRisk.addEventListener("click", () => {
       const btn = document.querySelector('.pill-toggle[data-layer="risk"]');
       if (btn) btn.click();
-      const riskSection = document.querySelector(".map-shell");
-      if (riskSection && typeof riskSection.scrollIntoView === "function") {
-        riskSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (typeof window.updateRiskChart === "function") {
+        window.updateRiskChart();
+      }
+      const graphSection = document.getElementById("riskGraphSection");
+      if (graphSection && typeof graphSection.scrollIntoView === "function") {
+        graphSection.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
   }
@@ -145,9 +148,12 @@ window.addEventListener("DOMContentLoaded", () => {
     navDisease.addEventListener("click", () => {
       const btn = document.querySelector('.pill-toggle[data-layer="pest"]');
       if (btn) btn.click();
-      const mapShell = document.querySelector(".map-shell");
-      if (mapShell && typeof mapShell.scrollIntoView === "function") {
-        mapShell.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (typeof window.updateDiseaseChart === "function") {
+        window.updateDiseaseChart();
+      }
+      const graphSection = document.getElementById("diseaseGraphSection");
+      if (graphSection && typeof graphSection.scrollIntoView === "function") {
+        graphSection.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
   }
