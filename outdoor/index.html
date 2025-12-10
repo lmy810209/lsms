@@ -5,6 +5,12 @@
   <title>LSMS OUTDOOR · 양재 HQ 실외조경 대시보드</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Material Symbols (아이콘 폰트) -->
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0"
+  />
+
   <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
@@ -150,93 +156,131 @@
       </div>
     </header>
 
-    <!-- 지도 + 필터 영역 -->
-    <section class="map-shell">
-      <header class="map-shell-header">
-        <div>
-          <h2 class="map-shell-title">실외조경 지도 · 전도 위험 · 병해충 포인트</h2>
-          <p class="map-shell-subtitle">
-            토양·강수·수분·기울기·통신·센서 데이터 기반으로 전도 위험 및 병해충 발생 포인트를 지도에서 직관적으로 확인합니다.
-          </p>
-        </div>
-        <div class="map-shell-actions">
-          <button class="btn btn-sm btn-ghost" id="btnTreeAdd">+ 수목 추가</button>
-          <button class="btn btn-sm btn-ghost" id="btnTreeSave">현재 뷰 저장</button>
-        </div>
-      </header>
+    <!-- 지도 + 필터 영역 + 날씨 패널 (좌: 지도, 우: 날씨) -->
+    <div class="layout-grid">
+      <div class="left-main">
+        <section class="map-shell">
+          <header class="map-shell-header">
+            <div>
+              <h2 class="map-shell-title">실외조경 지도 · 전도 위험 · 병해충 포인트</h2>
+              <p class="map-shell-subtitle">
+                토양·강수·수분·기울기·통신·센서 데이터 기반으로 전도 위험 및 병해충 발생 포인트를 지도에서 직관적으로 확인합니다.
+              </p>
+            </div>
+            <div class="map-shell-actions">
+              <button class="btn btn-sm btn-ghost" id="btnTreeAdd">+ 수목 추가</button>
+              <button class="btn btn-sm btn-ghost" id="btnTreeSave">현재 뷰 저장</button>
+            </div>
+          </header>
 
-      <div class="map-shell-body">
-        <!-- 좌측 필터 패널 -->
-        <aside class="map-filter-panel">
-          <div class="map-filter-section">
-            <div class="map-filter-title">표시 레이어</div>
-            <div class="pill-toggle-group">
-              <button class="pill-toggle is-active" data-layer="risk">
-                전도 위험 예측 포인트
-              </button>
-              <button class="pill-toggle" data-layer="pest">
-                병해충·고사 의심 수목
-              </button>
-              <button class="pill-toggle" data-layer="zone">
-                광장 포켓·집중 관리 구간
-              </button>
+          <div class="map-shell-body">
+            <!-- 좌측 필터 패널 -->
+            <aside class="map-filter-panel">
+              <div class="map-filter-section">
+                <div class="map-filter-title">표시 레이어</div>
+                <div class="pill-toggle-group">
+                  <button class="pill-toggle is-active" data-layer="risk">
+                    전도 위험 예측 포인트
+                  </button>
+                  <button class="pill-toggle" data-layer="pest">
+                    병해충·고사 의심 수목
+                  </button>
+                  <button class="pill-toggle" data-layer="zone">
+                    광장 포켓·집중 관리 구간
+                  </button>
+                </div>
+              </div>
+
+              <div class="map-filter-section">
+                <div class="map-filter-title">위험도 필터</div>
+                <div class="legend-list">
+                  <label class="legend-item">
+                    <input type="checkbox" class="legend-checkbox" data-risk="HIGH" checked />
+                    <span class="legend-color legend-high"></span>
+                    <span class="legend-label">HIGH (주의 필요)</span>
+                  </label>
+                  <label class="legend-item">
+                    <input type="checkbox" class="legend-checkbox" data-risk="MID" checked />
+                    <span class="legend-color legend-mid"></span>
+                    <span class="legend-label">MID (경계)</span>
+                  </label>
+                  <label class="legend-item">
+                    <input type="checkbox" class="legend-checkbox" data-risk="LOW" checked />
+                    <span class="legend-color legend-low"></span>
+                    <span class="legend-label">LOW (양호)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="map-filter-section">
+                <div class="map-filter-title">보기 옵션</div>
+                <label class="checkbox-row">
+                  <input type="checkbox" id="chkShowLabels" checked />
+                  <span>수목 ID 라벨 표시</span>
+                </label>
+                <label class="checkbox-row">
+                  <input type="checkbox" id="chkCluster" checked />
+                  <span>마커 클러스터링 사용</span>
+                </label>
+              </div>
+            </aside>
+
+            <!-- 우측 지도 -->
+            <div class="map-area">
+              <div class="map-toolbar">
+                <span class="map-provider-label">Map · Leaflet / Mapbox</span>
+                <div class="map-toolbar-buttons">
+                  <button class="btn-icon" id="btnZoomReset" title="초기 위치로">
+                    <span class="material-symbols-rounded">my_location</span>
+                  </button>
+                  <button class="btn-icon" id="btnMapType" title="배경 지도 전환">
+                    <span class="material-symbols-rounded">layers</span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="map" class="map-canvas"></div>
+              <!-- 추가 모드 안내 문구 자리 -->
+              <div id="addModeHint"></div>
             </div>
           </div>
-
-          <div class="map-filter-section">
-            <div class="map-filter-title">위험도 필터</div>
-            <div class="legend-list">
-              <label class="legend-item">
-                <input type="checkbox" class="legend-checkbox" data-risk="HIGH" checked />
-                <span class="legend-color legend-high"></span>
-                <span class="legend-label">HIGH (주의 필요)</span>
-              </label>
-              <label class="legend-item">
-                <input type="checkbox" class="legend-checkbox" data-risk="MID" checked />
-                <span class="legend-color legend-mid"></span>
-                <span class="legend-label">MID (경계)</span>
-              </label>
-              <label class="legend-item">
-                <input type="checkbox" class="legend-checkbox" data-risk="LOW" checked />
-                <span class="legend-color legend-low"></span>
-                <span class="legend-label">LOW (양호)</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="map-filter-section">
-            <div class="map-filter-title">보기 옵션</div>
-            <label class="checkbox-row">
-              <input type="checkbox" id="chkShowLabels" checked />
-              <span>수목 ID 라벨 표시</span>
-            </label>
-            <label class="checkbox-row">
-              <input type="checkbox" id="chkCluster" checked />
-              <span>마커 클러스터링 사용</span>
-            </label>
-          </div>
-        </aside>
-
-        <!-- 우측 지도 -->
-        <div class="map-area">
-          <div class="map-toolbar">
-            <span class="map-provider-label">Map · Leaflet / Mapbox</span>
-            <div class="map-toolbar-buttons">
-              <button class="btn-icon" id="btnZoomReset" title="초기 위치로">
-                <span class="material-symbols-rounded">my_location</span>
-              </button>
-              <button class="btn-icon" id="btnMapType" title="배경 지도 전환">
-                <span class="material-symbols-rounded">layers</span>
-              </button>
-            </div>
-          </div>
-
-          <div id="map" class="map-canvas"></div>
-          <!-- 추가 모드 안내 문구 자리 -->
-          <div id="addModeHint"></div>
-        </div>
+        </section>
       </div>
-    </section>
+
+      <!-- 오른쪽: 날씨 패널 -->
+      <aside class="right-panel">
+        <article class="card">
+          <div class="weather-card-header">
+            <div>
+              <div class="weather-title">오늘·7일 기상 · 강풍 예보</div>
+              <div class="weather-sub">
+                양재 HQ 기준 기온·강수·풍속 요약 · 병해충·전도 위험 조기 예측용 기초 데이터
+              </div>
+            </div>
+            <span class="weather-badge-today">실시간 예보 연동 예정</span>
+          </div>
+
+          <!-- 오늘 정보 -->
+          <div class="weather-today">
+            <div>
+              <div class="weather-today-main" id="todayTemp">27°C</div>
+              <div class="weather-today-meta" id="todayMeta">체감 29°C · 습도 68%</div>
+            </div>
+            <div class="weather-today-extra" id="todayExtra">
+              강수확률 30%<br />
+              평균 풍속 4 m/s<br />
+              순간 최대 9 m/s
+            </div>
+          </div>
+
+          <!-- 7일 예보 요약 (JS로 채움) -->
+          <div class="weather-forecast-title">7일 예보</div>
+          <div class="weather-forecast-list" id="forecastList">
+            <!-- 자바스크립트에서 자동으로 행(row)들을 채워 넣음 -->
+          </div>
+        </article>
+      </aside>
+    </div>
 
     <!-- ===== 수목 상세 정보/편집 패널 (기존 기능 유지) ===== -->
     <aside class="tree-detail-panel">

@@ -3,6 +3,8 @@
 let map;
 let markerLayer;
 let markersById = {};
+let MAP_LAYER_MODE = "risk"; // 'risk' | 'pest' | 'zone'
+const RISK_FILTER = { HIGH: true, MID: true, LOW: true };
 
 // 지도 초기화
 function mapInit() {
@@ -50,10 +52,23 @@ function renderTreesOnMap() {
 
   treeData.forEach((tree, index) => {
     const number = index + 1;
-    const riskLevel = (tree.risk_level || "LOW").toUpperCase();
+    const riskLevelRaw = (tree.risk_level || "LOW").toUpperCase();
+    let riskKey = "LOW";
+    if (riskLevelRaw === "HIGH") riskKey = "HIGH";
+    else if (riskLevelRaw === "MOD" || riskLevelRaw === "MID") riskKey = "MID";
+
+    // 위험도 필터 체크박스 상태 적용
+    if (!RISK_FILTER[riskKey]) return;
+
+    // 레이어 모드별 필터
+    if (MAP_LAYER_MODE === "pest") {
+      if (!(tree.disease && tree.disease.has_issue)) return;
+    }
+    // zone 모드는 현재는 필터 없이 전체 노출 (향후 확장용)
+
     let markerClass = "low";
-    if (riskLevel === "HIGH") markerClass = "high";
-    else if (riskLevel === "MOD" || riskLevel === "MID") markerClass = "mid";
+    if (riskKey === "HIGH") markerClass = "high";
+    else if (riskKey === "MID") markerClass = "mid";
 
     const iconHtml = `
       <div class="lsms-marker lsms-marker--${markerClass}">
@@ -277,5 +292,33 @@ document.addEventListener("click", (event) => {
   panels.forEach((p) => {
     const panelTab = p.getAttribute("data-tab-panel");
     p.style.display = panelTab === tab ? "" : "none";
+  });
+});
+
+// 레이어/위험도 필터 버튼 이벤트
+document.addEventListener("DOMContentLoaded", () => {
+  const layerButtons = document.querySelectorAll(".pill-toggle[data-layer]");
+  layerButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      layerButtons.forEach((b) =>
+        b.classList.toggle("is-active", b === btn)
+      );
+      MAP_LAYER_MODE = btn.getAttribute("data-layer") || "risk";
+      renderTreesOnMap();
+    });
+  });
+
+  const legendCheckboxes = document.querySelectorAll(
+    ".legend-checkbox[data-risk]"
+  );
+  legendCheckboxes.forEach((chk) => {
+    chk.addEventListener("change", () => {
+      const key = (chk.getAttribute("data-risk") || "").toUpperCase();
+      let norm = key;
+      if (norm === "MOD") norm = "MID";
+      if (!RISK_FILTER.hasOwnProperty(norm)) return;
+      RISK_FILTER[norm] = chk.checked;
+      renderTreesOnMap();
+    });
   });
 });
