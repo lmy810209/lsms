@@ -46,21 +46,21 @@
 
     <div class="side-section-label">MAIN</div>
     <ul class="nav-list">
-      <li class="nav-item active">
+      <li class="nav-item main-nav-item is-active" data-panel="panel-overview">
         <div class="nav-icon-round">🏙</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">양재HQ 실외조경 현황</span>
           <span class="nav-label-sub">지도로 한 번에 보는 위험·상태 요약</span>
         </div>
       </li>
-      <li class="nav-item" id="navRiskMonitor">
+      <li class="nav-item main-nav-item" data-panel="panel-risk">
         <div class="nav-icon-round">⚠</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">전도 위험 수목 모니터링</span>
           <span class="nav-label-sub">Structural Risk Score · 태풍·강풍 대비</span>
         </div>
       </li>
-      <li class="nav-item" id="navDiseaseMonitor">
+      <li class="nav-item main-nav-item" data-panel="panel-pest">
         <div class="nav-icon-round">🦠</div>
         <div class="nav-label-wrap">
           <span class="nav-label-main">병해충·수세 이상 감시</span>
@@ -112,54 +112,56 @@
   <!-- ========== 메인 영역 ========== -->
   <main class="main">
 
-    <!-- 상단 페이지 헤더 -->
-    <header class="page-header">
-      <div class="page-header-left">
-        <!-- 모바일 전용 햄버거 버튼 -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-        <h1 class="page-title">양재 HQ 실외조경 현황</h1>
-        <p class="page-subtitle">
-          기상·지형·수목 데이터를 기반으로 전도 위험·병해충 위험을 예측하는 LSMS OUTDOOR 전용 대시보드입니다.
-        </p>
-        <div class="page-tags">
-          <span class="pill pill-soft">LSMS OUTDOOR</span>
-          <span class="pill pill-soft">양재 HQ</span>
-          <span class="pill pill-soft">베타 버전</span>
-        </div>
-      </div>
-
-      <div class="page-header-right">
-        <div class="field-inline field-inline-sm">
-          <label class="field-label-sm">현장</label>
-          <select class="select select-sm" id="siteSelect">
-            <option value="yangjae">양재 HQ</option>
-            <option value="gangnam">강남사옥</option>
-          </select>
+    <!-- 1) 개요 / 지도 / 날씨 -->
+    <section id="panel-overview" class="main-panel is-active">
+      <!-- 상단 페이지 헤더 -->
+      <header class="page-header">
+        <div class="page-header-left">
+          <!-- 모바일 전용 햄버거 버튼 -->
+          <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+          <h1 class="page-title">양재 HQ 실외조경 현황</h1>
+          <p class="page-subtitle">
+            기상·지형·수목 데이터를 기반으로 전도 위험·병해충 위험을 예측하는 LSMS OUTDOOR 전용 대시보드입니다.
+          </p>
+          <div class="page-tags">
+            <span class="pill pill-soft">LSMS OUTDOOR</span>
+            <span class="pill pill-soft">양재 HQ</span>
+            <span class="pill pill-soft">베타 버전</span>
+          </div>
         </div>
 
-        <div class="field-inline field-inline-sm">
-          <label class="field-label-sm">기간</label>
-          <select class="select select-sm" id="rangeSelect">
-            <option value="today">오늘</option>
-            <option value="7d">최근 7일</option>
-            <option value="30d">최근 30일</option>
-          </select>
+        <div class="page-header-right">
+          <div class="field-inline field-inline-sm">
+            <label class="field-label-sm">현장</label>
+            <select class="select select-sm" id="siteSelect">
+              <option value="yangjae">양재 HQ</option>
+              <option value="gangnam">강남사옥</option>
+            </select>
+          </div>
+
+          <div class="field-inline field-inline-sm">
+            <label class="field-label-sm">기간</label>
+            <select class="select select-sm" id="rangeSelect">
+              <option value="today">오늘</option>
+              <option value="7d">최근 7일</option>
+              <option value="30d">최근 30일</option>
+            </select>
+          </div>
+
+          <span class="pill pill-soft" id="outdoorUserLabel">실시간 모니터링 온라인</span>
+          <span class="pill pill-soft">
+            현장: <span id="outdoorSiteLabel">현대차 양재 본사</span>
+          </span>
+          <button class="btn btn-sm btn-ghost" id="outdoorLogoutBtn">로그아웃</button>
+          <button class="btn btn-sm btn-ghost" id="btnExport">보고서 내보내기</button>
+          <button class="btn btn-sm btn-primary" id="btnRefreshMain">새로고침</button>
         </div>
+      </header>
 
-        <span class="pill pill-soft" id="outdoorUserLabel">실시간 모니터링 온라인</span>
-        <span class="pill pill-soft">
-          현장: <span id="outdoorSiteLabel">현대차 양재 본사</span>
-        </span>
-        <button class="btn btn-sm btn-ghost" id="outdoorLogoutBtn">로그아웃</button>
-        <button class="btn btn-sm btn-ghost" id="btnExport">보고서 내보내기</button>
-        <button class="btn btn-sm btn-primary" id="btnRefreshMain">새로고침</button>
-      </div>
-    </header>
-
-    <!-- 지도 + 필터 영역 + 날씨 패널 (좌: 지도, 우: 날씨) -->
-    <div class="layout-grid">
-      <div class="left-main">
-        <section class="map-shell" id="mapSection">
+      <!-- 지도 + 필터 영역 + 날씨 패널 (좌: 지도, 우: 날씨) -->
+      <div class="layout-grid">
+        <div class="left-main">
+          <section class="map-shell" id="mapSection">
           <header class="map-shell-header">
             <div>
               <h2 class="map-shell-title">실외조경 지도 · 전도 위험 · 병해충 포인트</h2>
@@ -242,49 +244,144 @@
               <div id="map" class="map-canvas"></div>
               <!-- 추가 모드 안내 문구 자리 -->
               <div id="addModeHint"></div>
-            </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
 
-      <!-- 오른쪽: 날씨 패널 -->
-      <aside class="right-panel" id="weatherPanel">
-        <article class="card">
-          <div class="weather-card-header">
-            <div>
-              <div class="weather-title">오늘·7일 기상 · 강풍 예보</div>
-              <div class="weather-sub">
-                양재 HQ 기준 기온·강수·풍속 요약 · 병해충·전도 위험 조기 예측용 기초 데이터
+        <!-- 오른쪽: 날씨 패널 -->
+        <aside class="right-panel" id="weatherPanel">
+          <article class="card">
+            <div class="weather-card-header">
+              <div>
+                <div class="weather-title">오늘·7일 기상 · 강풍 예보</div>
+                <div class="weather-sub">
+                  양재 HQ 기준 기온·강수·풍속 요약 · 병해충·전도 위험 조기 예측용 기초 데이터
+                </div>
+              </div>
+              <span class="weather-badge-today">실시간 예보 연동 예정</span>
+            </div>
+
+            <!-- 오늘 정보 -->
+            <div class="weather-today">
+              <div>
+                <div class="weather-today-main" id="todayTemp">27°C</div>
+                <div class="weather-today-meta" id="todayMeta">체감 29°C · 습도 68%</div>
+              </div>
+              <div class="weather-today-extra" id="todayExtra">
+                강수확률 30%<br />
+                평균 풍속 4 m/s<br />
+                순간 최대 9 m/s
               </div>
             </div>
-            <span class="weather-badge-today">실시간 예보 연동 예정</span>
+
+            <!-- 7일 예보 요약 (JS로 채움) -->
+            <div class="weather-forecast-title">7일 예보</div>
+            <div class="weather-forecast-list" id="forecastList">
+              <!-- 자바스크립트에서 자동으로 행(row)들을 채워 넣음 -->
+            </div>
+          </article>
+        </aside>
+      </div>
+
+      <!-- ===== 수목 상세 정보/편집 패널 (기존 기능 유지) ===== -->
+      <aside class="tree-detail-panel">
+        <div class="tree-detail-header">
+          <div id="treeTitle">-</div>
+          <div id="treeStatus" class="tree-status-text">-</div>
+        </div>
+
+        <div class="tree-detail-tabs">
+          <button class="tab active" type="button">생육 정보</button>
+          <button class="tab" type="button">전도 위험</button>
+          <button class="tab" type="button">최근 관리</button>
+        </div>
+
+        <div class="tree-detail-body">
+          <div class="tree-field">
+            <label class="field-label" for="treeId">수목 ID</label>
+            <div class="field-input-wrap">
+              <input id="treeId" class="field-input" readonly />
+            </div>
           </div>
 
-          <!-- 오늘 정보 -->
-          <div class="weather-today">
-            <div>
-              <div class="weather-today-main" id="todayTemp">27°C</div>
-              <div class="weather-today-meta" id="todayMeta">체감 29°C · 습도 68%</div>
-            </div>
-            <div class="weather-today-extra" id="todayExtra">
-              강수확률 30%<br />
-              평균 풍속 4 m/s<br />
-              순간 최대 9 m/s
+          <div class="tree-field">
+            <label class="field-label" for="treeSpecies">수종명</label>
+            <div class="field-input-wrap">
+              <input id="treeSpecies" class="field-input" />
             </div>
           </div>
 
-          <!-- 7일 예보 요약 (JS로 채움) -->
-          <div class="weather-forecast-title">7일 예보</div>
-          <div class="weather-forecast-list" id="forecastList">
-            <!-- 자바스크립트에서 자동으로 행(row)들을 채워 넣음 -->
+          <div class="tree-field">
+            <label class="field-label" for="treeZone">구역</label>
+            <div class="field-input-wrap">
+              <input id="treeZone" class="field-input" />
+            </div>
           </div>
-        </article>
+
+          <div class="tree-field">
+            <label class="field-label" for="treeType">유형</label>
+            <div class="field-input-wrap">
+              <select id="treeType" class="field-input">
+                <option value="교목">교목</option>
+                <option value="관목">관목</option>
+                <option value="지피">지피</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tree-field">
+            <label class="field-label" for="treeStatusSelect">상태</label>
+            <div class="field-input-wrap">
+              <select id="treeStatusSelect" class="field-input">
+                <option value="양호">양호</option>
+                <option value="주의">주의</option>
+                <option value="불량">불량</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tree-field">
+            <label class="field-label" for="treeHeight">수고(H)</label>
+            <div class="field-input-wrap">
+              <input id="treeHeight" type="number" step="0.1" class="field-input" />
+              <span class="field-unit">m</span>
+            </div>
+          </div>
+
+          <div class="tree-field">
+            <label class="field-label" for="treeDbh">흉고 직경</label>
+            <div class="field-input-wrap">
+              <input id="treeDbh" type="number" step="0.1" class="field-input" />
+              <span class="field-unit">cm</span>
+            </div>
+          </div>
+
+          <div class="tree-field">
+            <label class="field-label" for="treeCrown">수관 폭</label>
+            <div class="field-input-wrap">
+              <input id="treeCrown" type="number" step="0.1" class="field-input" />
+              <span class="field-unit">m</span>
+            </div>
+          </div>
+
+          <div class="tree-field">
+            <label class="field-label" for="treeMemo">메모</label>
+            <div class="field-input-wrap">
+              <textarea id="treeMemo" class="field-input" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="tree-actions">
+          <button id="btnTreeEdit" class="btn-secondary" type="button">수정</button>
+          <button id="btnTreeSaveDetail" class="btn-primary" type="button">저장</button>
+          <button id="btnTreeCancel" class="btn-ghost" type="button">취소</button>
+        </div>
       </aside>
-    </div>
+      <!-- ===== 수목 상세 패널 끝 ===== -->
+    </section>
 
-    <!-- 위험/병해충 그래프 영역 -->
-    <section class="bottom-grid" style="margin-top:16px;" id="graphSection">
-      <!-- 전도 위험 그래프 -->
+    <!-- 2) 전도 위험 수목 모니터링 -->
+    <section id="panel-risk" class="main-panel">
       <article class="card" id="riskGraphSection">
         <div class="card-header">
           <div>
@@ -311,8 +408,10 @@
           </div>
         </div>
       </article>
+    </section>
 
-      <!-- 병해충 그래프 -->
+    <!-- 3) 병해충·수세 이상 감시 -->
+    <section id="panel-pest" class="main-panel">
       <article class="card" id="diseaseGraphSection">
         <div class="card-header">
           <div>
@@ -340,103 +439,6 @@
         </div>
       </article>
     </section>
-
-    <!-- ===== 수목 상세 정보/편집 패널 (기존 기능 유지) ===== -->
-    <aside class="tree-detail-panel">
-      <div class="tree-detail-header">
-        <div id="treeTitle">-</div>
-        <div id="treeStatus" class="tree-status-text">-</div>
-      </div>
-
-      <div class="tree-detail-tabs">
-        <button class="tab active" type="button">생육 정보</button>
-        <button class="tab" type="button">전도 위험</button>
-        <button class="tab" type="button">최근 관리</button>
-      </div>
-
-      <div class="tree-detail-body">
-        <div class="tree-field">
-          <label class="field-label" for="treeId">수목 ID</label>
-          <div class="field-input-wrap">
-            <input id="treeId" class="field-input" readonly />
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeSpecies">수종명</label>
-          <div class="field-input-wrap">
-            <input id="treeSpecies" class="field-input" />
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeZone">구역</label>
-          <div class="field-input-wrap">
-            <input id="treeZone" class="field-input" />
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeType">유형</label>
-          <div class="field-input-wrap">
-            <select id="treeType" class="field-input">
-              <option value="교목">교목</option>
-              <option value="관목">관목</option>
-              <option value="지피">지피</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeStatusSelect">상태</label>
-          <div class="field-input-wrap">
-            <select id="treeStatusSelect" class="field-input">
-              <option value="양호">양호</option>
-              <option value="주의">주의</option>
-              <option value="불량">불량</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeHeight">수고(H)</label>
-          <div class="field-input-wrap">
-            <input id="treeHeight" type="number" step="0.1" class="field-input" />
-            <span class="field-unit">m</span>
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeDbh">흉고 직경</label>
-          <div class="field-input-wrap">
-            <input id="treeDbh" type="number" step="0.1" class="field-input" />
-            <span class="field-unit">cm</span>
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeCrown">수관 폭</label>
-          <div class="field-input-wrap">
-            <input id="treeCrown" type="number" step="0.1" class="field-input" />
-            <span class="field-unit">m</span>
-          </div>
-        </div>
-
-        <div class="tree-field">
-          <label class="field-label" for="treeMemo">메모</label>
-          <div class="field-input-wrap">
-            <textarea id="treeMemo" class="field-input" rows="2"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="tree-actions">
-        <button id="btnTreeEdit" class="btn-secondary" type="button">수정</button>
-        <button id="btnTreeSaveDetail" class="btn-primary" type="button">저장</button>
-        <button id="btnTreeCancel" class="btn-ghost" type="button">취소</button>
-      </div>
-    </aside>
-    <!-- ===== 수목 상세 패널 끝 ===== -->
   </main>
 
   <!-- ========== JS 로딩 (OUTDOOR 전용) ========== -->

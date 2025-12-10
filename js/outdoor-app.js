@@ -126,35 +126,43 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // 5) 사이드바 MAIN 메뉴 클릭 시 레이어/그래프와 연동
-  const navRisk = document.getElementById("navRiskMonitor");
-  const navDisease = document.getElementById("navDiseaseMonitor");
+  // 5) 사이드바 MAIN 메뉴 클릭 시 패널 전환
+  const mainNavItems = document.querySelectorAll(".main-nav-item[data-panel]");
+  const mainPanels = document.querySelectorAll(".main-panel");
 
-  if (navRisk) {
-    navRisk.addEventListener("click", () => {
-      const btn = document.querySelector('.pill-toggle[data-layer="risk"]');
-      if (btn) btn.click();
-      if (typeof window.updateRiskChart === "function") {
-        window.updateRiskChart();
-      }
-      const graphSection = document.getElementById("riskGraphSection");
-      if (graphSection && typeof graphSection.scrollIntoView === "function") {
-        graphSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  }
+  if (mainNavItems.length && mainPanels.length) {
+    mainNavItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const targetId = item.getAttribute("data-panel");
 
-  if (navDisease) {
-    navDisease.addEventListener("click", () => {
-      const btn = document.querySelector('.pill-toggle[data-layer="pest"]');
-      if (btn) btn.click();
-      if (typeof window.updateDiseaseChart === "function") {
-        window.updateDiseaseChart();
-      }
-      const graphSection = document.getElementById("diseaseGraphSection");
-      if (graphSection && typeof graphSection.scrollIntoView === "function") {
-        graphSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+        // 좌측 메뉴 active 처리
+        mainNavItems.forEach((el) => {
+          el.classList.toggle("is-active", el === item);
+        });
+
+        // 메인 패널 show/hide
+        mainPanels.forEach((panel) => {
+          panel.classList.toggle("is-active", panel.id === targetId);
+        });
+
+        // 패널별 추가 동작 (그래프/레이어 연동)
+        if (targetId === "panel-risk") {
+          const btn = document.querySelector('.pill-toggle[data-layer="risk"]');
+          if (btn) btn.click();
+          if (typeof window.updateRiskChart === "function") {
+            window.updateRiskChart();
+          }
+        } else if (targetId === "panel-pest") {
+          const btn = document.querySelector('.pill-toggle[data-layer="pest"]');
+          if (btn) btn.click();
+          if (typeof window.updateDiseaseChart === "function") {
+            window.updateDiseaseChart();
+          }
+        } else if (targetId === "panel-overview") {
+          const btn = document.querySelector('.pill-toggle[data-layer="all"]');
+          if (btn) btn.click();
+        }
+      });
     });
   }
 });

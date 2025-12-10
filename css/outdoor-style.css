@@ -108,6 +108,15 @@
   gap: 6px;
 }
 
+/* 메인 패널(지도 / 전도 위험 / 병해충) 토글 */
+.main-panel {
+  display: none;
+}
+
+.main-panel.is-active {
+  display: block;
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
