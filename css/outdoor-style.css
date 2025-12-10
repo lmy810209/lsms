@@ -611,6 +611,7 @@
   padding: 6px 8px;
   border-radius: 10px;
   background: #0f172a;
+  color: #e5e7eb;
 }
 
 .top-risk-item .rank {
@@ -620,6 +621,10 @@
 
 .top-risk-item .id {
   font-weight: 600;
+}
+
+.top-risk-item .species {
+  color: #cbd5f5;
 }
 
 .top-risk-item .score {
