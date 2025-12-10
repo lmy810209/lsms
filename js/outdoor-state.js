@@ -1,6 +1,6 @@
 // js/outdoor-state.js
 // LSMS OUTDOOR 상태 모듈
-// - userRole: 현재 사용자 권한 (기본값 'guest', app.js에서 로그인 후 덮어씀)
+// - userRole: 현재 사용자 권한 (기본값 'admin')
 // - trees: 실외 수목 데이터 (기존 outdoor-trees.js 의 treeData 초기값)
 // - getTrees(), setTrees(), isAdmin() 헬퍼 제공
 
@@ -9,7 +9,7 @@
     const outdoor = (LSMS.outdoor = LSMS.outdoor || {});
   
     // 1) 현재 사용자 권한 (추후 인증 모듈에서 변경 가능)
-    outdoor.userRole = "guest"; // 'admin' | 'worker' | 'guest' 등
+    outdoor.userRole = "admin"; // 'admin' | 'worker' | 'guest' 등
   
     // 2) 실외 수목 데이터 (기존 treeData 그대로 이동)
     outdoor.trees = [
@@ -24,20 +24,26 @@
         height: 7.2,
         dbh: 28,
         crown: 5.4,
-        crown_width: 5.4,
-        crown_height: null,
         planted_year: 2012,
+        // 경사/기울기(도 단위로 사용)
         slope: 8,
         tilt: 4,
+        // 토양·뿌리 상태 (새 전도 위험 로직용)
+        soil_stability: "보통", // 단단함 / 보통 / 연약함
+        root_issue: "없음", // 없음 / 약간 / 심함
+        // 기존 필드(참고용)
         root_lift: false,
         drainage: "보통",
         trunk_crack: false,
         crown_lean: "약함",
-        // 토양/뿌리 상태 (위험도 계산용)
-        soil_stability: "보통", // 단단함 / 보통 / 연약함
-        root_condition: "없음", // 없음 / 약간 / 심함
-        risk_base: 37,
-        risk_instant: 37,
+        // 낙엽 여부 (소나무는 상록)
+        deciduous: false,
+        // 위험도 관련 점수 (코드에서 계산해 채움)
+        risk_base: 0,
+        risk_weather: 0,
+        risk_instant: 0,
+        risk_score: 37,
+        health_score: 82,
         risk_level: "LOW",
         history: {
           pruning: "2024-03-20",
@@ -71,20 +77,24 @@
         height: 6.1,
         dbh: 24,
         crown: 4.1,
-        crown_width: 4.1,
-        crown_height: null,
         planted_year: 2014,
         slope: 14,
         tilt: 7,
+        soil_stability: "연약함",
+        root_issue: "심함",
         root_lift: true,
         drainage: "불량",
         trunk_crack: false,
         crown_lean: "중간",
-        soil_stability: "연약함",
-        root_condition: "심함",
-        risk_base: 62,
-        risk_instant: 62,
-        risk_level: "MOD",
+        // 낙엽 교목
+        deciduous: true,
+        risk_base: 0,
+        risk_weather: 0,
+        risk_instant: 0,
+        risk_score: 62,
+        health_score: 74,
+        // 기존 'MOD' 대신 새 로직에서 'MID' / 'HIGH' 로 재계산
+        risk_level: "MID",
         history: {
           pruning: "2024-04-15",
           pest: "2024-08-10",
@@ -117,19 +127,21 @@
         height: 1.1,
         dbh: 6,
         crown: 1.2,
-        crown_width: 1.2,
-        crown_height: null,
         planted_year: 2020,
         slope: 2,
         tilt: 1,
+        soil_stability: "단단함",
+        root_issue: "없음",
         root_lift: false,
         drainage: "양호",
         trunk_crack: false,
         crown_lean: "없음",
-        soil_stability: "단단함",
-        root_condition: "없음",
-        risk_base: 20,
-        risk_instant: 20,
+        deciduous: false,
+        risk_base: 0,
+        risk_weather: 0,
+        risk_instant: 0,
+        risk_score: 20,
+        health_score: 90,
         risk_level: "LOW",
         history: {
           pruning: "2024-04-02",
@@ -171,5 +183,3 @@
       return this.userRole === "admin";
     };
   })(window);
-  
-  console.log("OUTDOOR STATE LOADED");

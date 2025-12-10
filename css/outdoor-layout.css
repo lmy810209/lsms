@@ -107,8 +107,7 @@
   transform: translateX(2px);
 }
 
-.nav-item.active,
-.main-nav-item.is-active {
+.nav-item.active {
   background: #1d4ed8;
 }
 
@@ -125,8 +124,7 @@
   font-size: 15px;
 }
 
-.nav-item.active .nav-icon-round,
-.main-nav-item.is-active .nav-icon-round {
+.nav-item.active .nav-icon-round {
   border-color: rgba(255, 255, 255, 0.9);
   background: rgba(15, 23, 42, 0.25);
 }

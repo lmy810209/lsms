@@ -1,442 +1,380 @@
-// ===== 전도 위험도 계산 및 TOP5 리스트 =====
+// ===== 전도 위험 계산 / TOP5 모듈 =====
 
-// 1) 기본 전도 위험도 + 상세 분석 (UI 설명용)
-function computeBaseRiskAnalysis(tree) {
-  const h = Number.isFinite(tree.height) ? Number(tree.height) : 0;
-  const dbh = Number.isFinite(tree.dbh) ? Number(tree.dbh) : 0.0001;
-  const crown = Number.isFinite(tree.crown_width)
-    ? Number(tree.crown_width)
-    : Number.isFinite(tree.crown)
-    ? Number(tree.crown)
-    : 0;
-  const tilt = Number.isFinite(tree.tilt) ? Number(tree.tilt) : 0;
-  const soilSlope = Number.isFinite(tree.slope) ? Number(tree.slope) : 0;
-  const health =
-    Number.isFinite(tree.health_score) && tree.health_score != null
-      ? Math.max(0, Math.min(100, Number(tree.health_score)))
-      : 80;
+// (기존 AI 테스트 패널용 함수는 하단에 그대로 유지)
 
-  // 1) 수고 점수
-  const heightScore = Math.min(h / 20, 1);
+function clamp(x, min, max) {
+  return Math.max(min, Math.min(max, x));
+}
 
-  // 2) 세장비 (높이/직경)
-  const slender = h / (dbh / 100);
-  const slenderScore = Math.min(slender / 80, 1);
+// 수종 → 낙엽/상록 추정 (초기 버전: 필요 시 테이블 보완)
+function inferDeciduous(species) {
+  if (!species) return true;
+  // 대표 상록수 키워드
+  const evergreenKeywords = ["소나무", "회양목", "향나무", "측백", "주목"];
+  if (evergreenKeywords.some((k) => species.includes(k))) return false;
+  return true; // 나머지는 기본적으로 낙엽으로 처리
+}
 
-  // 3) 수관 크기
-  const crownScore = Math.min(crown / 10, 1);
+// 단일 수목의 전도 위험 계산 + breakdown 기록
+// weatherOverride 를 넘기면 해당 값으로 기상 영향만 따로 시험 가능
+function computeTreeRisk(tree, weatherOverride) {
+  if (!tree) return tree;
 
-  // 4) 나무 기울기
-  const tiltScore = Math.min(tilt / 45, 1);
-
-  // 5) 토양 경사
-  const slopeScore = Math.min(soilSlope / 30, 1);
-
-  // 6) 수종 계수
-  const speciesFactor =
-    {
-      "소나무": 1.1,
-      "은행나무": 0.8,
-      "느티나무": 1.0,
-    }[tree.species] || 1.0;
-
-  // 7) 토양 안정도 / 뿌리 이상 여부 계수
-  const soilLabel = tree.soil_stability || tree.drainage || "보통";
-  let soilFactor = 1.0;
-  if (soilLabel === "단단함") soilFactor = 0.9;
-  else if (soilLabel === "연약함") soilFactor = 1.2;
-
-  const rootLabel =
-    tree.root_condition || (tree.root_lift ? "약간" : "없음");
-  let rootFactor = 1.0;
-  if (rootLabel === "약간") rootFactor = 1.15;
-  else if (rootLabel === "심함") rootFactor = 1.3;
-
-  // 8) 건강 점수 계수 (건강이 나쁠수록 위험도 ↑)
-  const healthFactor = 1.0 + ((100 - health) / 100) * 0.3; // 최대 +30%
-
-  // 9) 기울기/경사 가중치 포함한 기본 점수 (0~100)
-  const weighted =
-    0.22 * heightScore +
-    0.18 * slenderScore +
-    0.18 * crownScore +
-    0.22 * tiltScore +
-    0.20 * slopeScore;
-
-  const structural = weighted * 100; // 순수 형상/지형 기반 점수
-
-  // 구성 비중을 그대로 점수화
-  const contribHeight = 0.22 * heightScore * 100;
-  const contribSlender = 0.18 * slenderScore * 100;
-  const contribCrown = 0.18 * crownScore * 100;
-  const contribTilt = 0.22 * tiltScore * 100;
-  const contribSlope = 0.20 * slopeScore * 100;
-
-  // 수종/토양/뿌리/건강 가중치가 추가로 만드는 점수 변화 추정
-  const afterSpecies = structural * speciesFactor;
-  const deltaSpecies = afterSpecies - structural;
-
-  const afterSoil = afterSpecies * soilFactor;
-  const deltaSoil = afterSoil - afterSpecies;
-
-  const afterRoot = afterSoil * rootFactor;
-  const deltaRoot = afterRoot - afterSoil;
-
-  const afterHealth = afterRoot * healthFactor;
-  const deltaHealth = afterHealth - afterRoot;
-
-  const baseRaw = afterHealth;
-  const base = Math.min(100, Math.round(baseRaw));
-
-  return {
-    base,
-    structural: {
-      total: Math.round(structural),
-      height: Math.round(contribHeight),
-      slender: Math.round(contribSlender),
-      crown: Math.round(contribCrown),
-      tilt: Math.round(contribTilt),
-      slope: Math.round(contribSlope),
-    },
-    modifiers: {
-      species: {
-        label: tree.species || "-",
-        delta: Math.round(deltaSpecies),
-      },
-      soil: {
-        label: soilLabel,
-        delta: Math.round(deltaSoil),
-      },
-      root: {
-        label: rootLabel,
-        delta: Math.round(deltaRoot),
-      },
-      health: {
-        score: health,
-        delta: Math.round(deltaHealth),
-      },
-    },
+  const weather = weatherOverride || window.LSMS_WEATHER_TODAY || {
+    wind_avg: 3.0,
+    wind_max: 6.0,
+    rain_3d: 0.0,
+    snow_cm: 0.0,
+    month: new Date().getMonth() + 1,
   };
-}
 
-// 기존 API는 단순 점수만 반환 (호환용)
-function computeBaseRisk(tree) {
-  return computeBaseRiskAnalysis(tree).base;
-}
+  const type = tree.type || "";
+  const height = Number(tree.height || 0);
 
-// 2) 실시간 날씨 계수 + 상세 분석
-function computeWeatherFactorDetail(weather) {
-  const wind = weather?.wind_max ?? weather?.wind_avg ?? 0;
-  const rain = weather?.rain_mm ?? 0;
-  const snow = weather?.snow_cm ?? 0;
+  // 1단계 – 전도 위험 계산 대상 필터
+  if (!(type === "교목" && height >= 5.0)) {
+    tree.risk_base = 0;
+    tree.risk_weather = 0;
+    tree.risk_instant = 0;
+    tree.risk_score = 0;
+    tree.risk_level = "LOW";
+    tree._risk_detail = null;
+    return tree;
+  }
 
-  let f_wind = 1.0;
-  if (wind > 5) f_wind = 1.1;
-  if (wind > 8) f_wind = 1.25;
-  if (wind > 12) f_wind = 1.5;
-  if (wind > 15) f_wind = 1.8;
+  const dbh = Number(tree.dbh || 0);
+  const crownWidth = Number(tree.crown || tree.crown_width || 0);
+  const slopeDeg = Number(tree.slope || tree.slope_deg || 0);
+  const tiltDeg = Number(tree.tilt || tree.tilt_deg || 0);
+  const soil = tree.soil_stability || "보통";
+  const rootIssue = tree.root_issue || "없음";
 
-  const f_rain = 1.0 + Math.min(rain / 50, 0.3);
-  const f_snow = 1.0 + Math.min(snow / 20, 0.3);
+  // === 튜닝 포인트: 구조 위험도 가산점 ===
+  // 2단계 – 기본 구조 위험도 (수고·수관·경사·기울기·토양·뿌리)
+  let base = 0;
+  const baseItems = [];
 
-  return {
-    factor: f_wind * f_rain * f_snow,
-    wind,
-    rain,
-    snow,
-    f_wind,
-    f_rain,
-    f_snow,
-  };
-}
+  // (1) 키/수관 크기
+  let delta = 0;
+  if (height >= 5 && height < 8) delta = 10;
+  else if (height >= 8 && height < 12) delta = 20;
+  else if (height >= 12) delta = 30;
+  base += delta;
+  if (delta) baseItems.push({ label: `수고 ${height}m`, score: delta });
 
-function computeWeatherFactor(weather) {
-  return computeWeatherFactorDetail(weather || {}).factor;
-}
+  delta = 0;
+  if (crownWidth >= 4 && crownWidth < 6) delta = 10;
+  else if (crownWidth >= 6) delta = 15;
+  base += delta;
+  if (delta) baseItems.push({ label: `수관폭 ${crownWidth}m`, score: delta });
 
-// 3) 개별 수목의 실시간 전도 위험도 계산 + 요인 분석 저장
-function computeInstantRisk(tree, weather) {
-  const baseInfo = computeBaseRiskAnalysis(tree);
-  const weatherInfo = computeWeatherFactorDetail(weather || {});
+  delta = 0;
+  if (dbh >= 30 && dbh < 50) delta = 5;
+  else if (dbh >= 50) delta = 10;
+  base += delta;
+  if (delta) baseItems.push({ label: `흉고직경 ${dbh}cm`, score: delta });
 
-  const base = baseInfo.base;
-  const factor = weatherInfo.factor;
-  const instantRaw = base * factor;
-  const instant = Math.min(100, Math.round(instantRaw));
+  // (2) 지반 경사 / 수목 기울기
+  delta = 0;
+  if (slopeDeg >= 5 && slopeDeg < 15) delta = 10;
+  else if (slopeDeg >= 15 && slopeDeg < 30) delta = 20;
+  else if (slopeDeg >= 30) delta = 30;
+  base += delta;
+  if (delta) baseItems.push({ label: `지반 경사 ${slopeDeg}°`, score: delta });
+
+  delta = 0;
+  if (tiltDeg >= 5 && tiltDeg < 10) delta = 10;
+  else if (tiltDeg >= 10 && tiltDeg < 20) delta = 20;
+  else if (tiltDeg >= 20) delta = 30;
+  base += delta;
+  if (delta) baseItems.push({ label: `수목 기울기 ${tiltDeg}°`, score: delta });
+
+  // (3) 토양 상태 / 뿌리 이상
+  delta = 0;
+  if (soil === "보통") delta = 10;
+  else if (soil === "연약함") delta = 20;
+  base += delta;
+  if (delta) baseItems.push({ label: `토양 상태 ${soil}`, score: delta });
+
+  delta = 0;
+  if (rootIssue === "약간") delta = 10;
+  else if (rootIssue === "심함") delta = 25;
+  base += delta;
+  if (delta) baseItems.push({ label: `뿌리 이상 ${rootIssue}`, score: delta });
+
+  const riskBase = clamp(base, 0, 100);
+
+  // 3단계 – 기상 가중치
+  const v = Number(weather.wind_max || 0);
+  const r = Number(weather.rain_3d || 0);
+  const s = Number(weather.snow_cm || 0);
+  const m = Number(weather.month || new Date().getMonth() + 1);
+
+  const isDeciduous =
+    typeof tree.deciduous === "boolean"
+      ? tree.deciduous
+      : inferDeciduous(tree.species || "");
+  tree.deciduous = isDeciduous;
+
+  // === 튜닝 포인트: 풍속 가중치 ===
+  // (A) 풍속 영향 (wind_max 기준)
+  let w_wind = 0;
+  if (v < 7) w_wind = 0;
+  else if (v < 10) w_wind = 5;
+  else if (v < 15) w_wind = 10;
+  else if (v < 20) w_wind = 20;
+  else w_wind = 30;
+
+  let wind_factor = 1.0;
+  const leafOn = m >= 4 && m <= 10;
+  if (!isDeciduous) {
+    wind_factor = 1.3;
+  } else {
+    wind_factor = leafOn ? 1.1 : 0.3;
+  }
+  const w_wind_adj = Math.round(w_wind * wind_factor);
+
+  // === 튜닝 포인트: 강우 가중치 ===
+  // (B) 강우 영향 (최근 3일 누적 강우량 기준)
+  let w_rain = 0;
+  if (r < 50) w_rain = 0;
+  else if (r < 100) w_rain = 10;
+  else w_rain = 20;
+
+  let rain_factor = 1.0;
+  if (soil === "연약함") rain_factor += 0.5;
+  if (slopeDeg >= 15) rain_factor += 0.5;
+  const w_rain_adj = Math.round(w_rain * rain_factor);
+
+  // === 튜닝 포인트: 적설 + 상록/낙엽 계수 ===
+  // (C) 적설 영향 + 낙엽/상록·계절 계수
+  let w_snow = 0;
+  if (s < 5) w_snow = 0;
+  else if (s < 15) w_snow = 10;
+  else w_snow = 20;
+
+  let snow_factor = 1.0;
+  if (!isDeciduous) {
+    snow_factor = 1.2;
+  } else {
+    const leafOnSnow = m >= 4 && m <= 10;
+    snow_factor = leafOnSnow ? 0.8 : 0.2;
+  }
+  const w_snow_adj = Math.round(w_snow * snow_factor);
+
+  const riskWeather = clamp(w_wind_adj + w_rain_adj + w_snow_adj, 0, 100);
+
+  // === 튜닝 포인트: LOW/MID/HIGH 컷 ===
+  // 4단계 – 최종 실시간 위험도 및 등급
+  const riskInstant = clamp(riskBase + riskWeather, 0, 100);
 
   let level = "LOW";
-  if (instant >= 40) level = "MID";
-  if (instant >= 70) level = "HIGH";
+  if (riskInstant >= 60) level = "HIGH";
+  else if (riskInstant >= 30) level = "MID";
 
-  // 날씨로 인해 추가된 점수(풍속/비/눈 별로 분해)
-  const deltaWind = base * (weatherInfo.f_wind - 1);
-  const deltaRain = base * weatherInfo.f_wind * (weatherInfo.f_rain - 1);
-  const deltaSnow =
-    base * weatherInfo.f_wind * weatherInfo.f_rain * (weatherInfo.f_snow - 1);
+  tree.risk_base = riskBase;
+  tree.risk_weather = riskWeather;
+  tree.risk_instant = riskInstant;
+  // 기존 차트·팝업 호환용
+  tree.risk_score = riskInstant;
+  tree.risk_level = level;
 
-  const detail = {
-    static: baseInfo,
-    weather: {
-      wind: weatherInfo.wind,
-      rain_mm: weatherInfo.rain,
-      snow_cm: weatherInfo.snow,
-      deltaWind: Math.round(deltaWind),
-      deltaRain: Math.round(deltaRain),
-      deltaSnow: Math.round(deltaSnow),
-      factor: weatherInfo.factor,
+  tree._risk_detail = {
+    base: {
+      total: riskBase,
+      items: baseItems,
     },
-    total: {
-      base,
-      instant,
-      extraFromWeather: instant - base,
+    weather: {
+      total: riskWeather,
+      wind: { raw: w_wind, factor: wind_factor, score: w_wind_adj, v },
+      rain: { raw: w_rain, factor: rain_factor, score: w_rain_adj, r },
+      snow: { raw: w_snow, factor: snow_factor, score: w_snow_adj, s },
+      meta: { month: m, isDeciduous, leafOn },
+    },
+    instant: {
+      total: riskInstant,
       level,
     },
   };
 
-  try {
-    // 저장/전송 시에는 saveTreesToServer()에서 이 필드를 제거
-    tree._riskDetail = detail;
-  } catch (e) {
-    // 읽기 전용 객체일 수 있으므로 실패해도 무시
-  }
-
-  return { base, instant, level };
+  return tree;
 }
 
-// 4) 전체 트리에 위험도 필드 반영
-function updateAllTreeRisks(treeData, weatherToday) {
-  if (!Array.isArray(treeData)) return;
-  const weather = weatherToday || window.LSMS_WEATHER_TODAY || null;
-
-  treeData.forEach((tree) => {
-    const { base, instant, level } = computeInstantRisk(tree, weather);
-    tree.risk_base = base;
-    tree.risk_instant = instant;
-    tree.risk_level = level;
+// 전체 treeData에 대해 위험도 재계산
+function recalcAllTreeRisks() {
+  if (!Array.isArray(window.treeData)) return;
+  window.treeData.forEach((t, idx) => {
+    window.treeData[idx] = computeTreeRisk(t);
   });
 }
 
-// 5) 위험도 기준 TOP5 추출
-function getTodayTopRisk(treeData) {
-  if (!Array.isArray(treeData)) return [];
-  return [...treeData]
-    .map((t) => {
-      let score = 0;
-      if (typeof t.risk_instant === "number") score = t.risk_instant;
-      else if (typeof t.risk_base === "number") score = t.risk_base;
-      else if (typeof t.risk_score === "number") score = t.risk_score;
-      return { tree: t, score };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5);
-}
+// TOP5 렌더링 (전도 경보판)
+function renderRiskTop5() {
+  const listEl = document.getElementById("riskTop5List");
+  const emptyEl = document.getElementById("riskTop5Empty");
+  if (!listEl || !emptyEl || !Array.isArray(window.treeData)) return;
 
-// 6) TOP5 리스트 렌더링
-function renderTopRiskList(treeData) {
-  const container = document.getElementById("topRiskList");
-  if (!container) return;
+  const candidates = window.treeData.filter(
+    (t) => t.risk_level === "HIGH" && typeof t.risk_instant === "number"
+  );
+  const sorted = candidates.sort(
+    (a, b) => (b.risk_instant || 0) - (a.risk_instant || 0)
+  );
+  const top5 = sorted.slice(0, 5);
 
-  const top = getTodayTopRisk(treeData || window.treeData || []);
-  if (!top.length) {
-    container.innerHTML = `<div class="top-risk-empty">오늘은 우선 점검 대상 수목이 없습니다.</div>`;
+  listEl.innerHTML = "";
+
+  if (!top5.length) {
+    emptyEl.style.display = "block";
     return;
   }
 
-  container.innerHTML = top
-    .map(
-      (entry, idx) => {
-        const tree = entry.tree || entry;
-        const score =
-          typeof tree.risk_instant === "number"
-            ? tree.risk_instant
-            : entry.score || 0;
-        return `
-      <div class="top-risk-item" data-tree-id="${tree.id || ""}">
-        <span class="rank">${idx + 1}</span>
-        <span class="id">${tree.id || "-"}</span>
-        <span class="species">${tree.species || "-"}</span>
-        <span class="score">${score}점</span>
+  emptyEl.style.display = "none";
+
+  top5.forEach((tree, idx) => {
+    const row = document.createElement("div");
+    row.className = "risk-top5-row";
+    row.dataset.treeId = tree.id;
+
+    row.innerHTML = `
+      <div class="risk-top5-rank">${idx + 1}</div>
+      <div class="risk-top5-main">
+        <div class="risk-top5-id">${tree.id}</div>
+        <div class="risk-top5-species">${tree.species || "-"}</div>
       </div>
+      <div class="risk-top5-score">${Math.round(
+        tree.risk_instant ?? 0
+      )}점</div>
     `;
-      }
-    )
-    .join("");
-}
 
-// 7) 대시보드 전체 위험도/마커/그래프 업데이트
-function refreshRiskDashboard() {
-  const data =
-    (typeof getTreeData === "function" && getTreeData()) ||
-    window.treeData ||
-    [];
-  const weather = window.LSMS_WEATHER_TODAY || null;
-
-  updateAllTreeRisks(data, weather);
-
-  if (typeof window.updateTreeMarkersByRisk === "function") {
-    window.updateTreeMarkersByRisk(data);
-  }
-
-  if (typeof window.updateRiskChart === "function") {
-    window.updateRiskChart();
-  }
-
-  renderTopRiskList(data);
-}
-
-// 8) TOP5 항목 클릭 시 위험도 요인 분석 모달
-function openRiskExplainModal(tree) {
-  if (!tree || !tree._riskDetail) return;
-  const modal = document.getElementById("riskExplainModal");
-  const titleEl = document.getElementById("riskExplainTitle");
-  const subtitleEl = document.getElementById("riskExplainSubtitle");
-  const scoreEl = document.getElementById("riskExplainScore");
-  const contentEl = document.getElementById("riskExplainContent");
-  if (!modal || !titleEl || !subtitleEl || !scoreEl || !contentEl) return;
-
-  const d = tree._riskDetail;
-  const staticInfo = d.static;
-  const weatherInfo = d.weather;
-
-  titleEl.textContent = `${tree.id || "-"} · ${tree.species || "-"}`;
-  subtitleEl.textContent = `구역: ${tree.zone || "-"} / 현재 위험도: ${
-    (d.total && d.total.level) || tree.risk_level || "-"
-  }`;
-  scoreEl.textContent = `${(d.total && d.total.instant) || tree.risk_instant || 0}점`;
-
-  const s = staticInfo.structural;
-  const m = staticInfo.modifiers;
-
-  const staticItems = [];
-  if (s) {
-    staticItems.push({
-      label: "기초 구조 점수(수고·두께·수관·기울기·경사)",
-      value: s.total,
+    row.addEventListener("click", () => {
+      showRiskDetailPopup(tree);
     });
-    if (s.tilt) {
-      staticItems.push({ label: "기울기 위험", value: s.tilt });
-    }
-    if (s.slope) {
-      staticItems.push({ label: "사면 경사 위험", value: s.slope });
-    }
-  }
-  if (m && m.soil && m.soil.delta) {
-    staticItems.push({
-      label: `토양 상태(${m.soil.label})`,
-      value: m.soil.delta,
-    });
-  }
-  if (m && m.root && m.root.delta) {
-    staticItems.push({
-      label: `뿌리 이상(${m.root.label})`,
-      value: m.root.delta,
-    });
-  }
 
-  const weatherItems = [];
-  if (weatherInfo) {
-    if (weatherInfo.deltaWind > 0) {
-      weatherItems.push({
-        label: `오늘 풍속(${weatherInfo.wind.toFixed(1)} m/s)`,
-        value: weatherInfo.deltaWind,
-      });
-    }
-    if (weatherInfo.deltaRain > 0) {
-      weatherItems.push({
-        label: `강수량 영향(지반 약화)`,
-        value: weatherInfo.deltaRain,
-      });
-    }
-    if (weatherInfo.deltaSnow > 0) {
-      weatherItems.push({
-        label: `적설/눈 영향`,
-        value: weatherInfo.deltaSnow,
-      });
-    }
-  }
-
-  const makeListHtml = (items) => {
-    if (!items.length) {
-      return `<li class="risk-explain-item-empty">특이 위험 요인이 없습니다.</li>`;
-    }
-    return items
-      .map(
-        (it) =>
-          `<li class="risk-explain-item"><span>${it.label}</span><span>+${
-            it.value
-          }점</span></li>`
-      )
-      .join("");
-  };
-
-  contentEl.innerHTML = `
-    <div class="risk-explain-section">
-      <div class="risk-explain-section-title">정적 요소 (수목·지형·토양)</div>
-      <ul class="risk-explain-list">
-        ${makeListHtml(staticItems)}
-      </ul>
-    </div>
-    <div class="risk-explain-section">
-      <div class="risk-explain-section-title">실시간 기상 영향</div>
-      <ul class="risk-explain-list">
-        ${makeListHtml(weatherItems)}
-      </ul>
-      <div class="risk-explain-footer">
-        날씨 영향으로 추가된 위험도: <strong>${
-          (d.total && d.total.extraFromWeather) || 0
-        }점</strong>
-      </div>
-    </div>
-  `;
-
-  modal.hidden = false;
+    listEl.appendChild(row);
+  });
 }
 
-function closeRiskExplainModal() {
-  const modal = document.getElementById("riskExplainModal");
-  if (modal) modal.hidden = true;
-}
-
-// 이벤트 바인딩
-document.addEventListener("click", (event) => {
-  const item = event.target.closest(".top-risk-item");
-  if (item) {
-    const treeId = item.getAttribute("data-tree-id");
-    if (!treeId) return;
-    const data =
-      (typeof getTreeData === "function" && getTreeData()) ||
-      window.treeData ||
-      [];
-    const tree = Array.isArray(data)
-      ? data.find((t) => t && t.id === treeId)
-      : null;
-    if (tree) {
-      openRiskExplainModal(tree);
-    }
+// 간단한 분석 팝업 (설계서 예시 형식에 가깝게 텍스트 구성)
+function showRiskDetailPopup(tree) {
+  const detail = tree._risk_detail;
+  if (!detail) {
+    alert("위험도 계산 정보가 없습니다.");
     return;
   }
-});
 
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("riskExplainModal");
-  const closeBtn = document.getElementById("riskExplainClose");
-  if (closeBtn) {
-    closeBtn.addEventListener("click", closeRiskExplainModal);
+  const lines = [];
+  lines.push(
+    `${tree.id} · ${tree.species || ""} (${tree.zone || "-"}) – 현재 위험도: ${
+      detail.instant.total
+    }점 (${detail.instant.level})`
+  );
+  lines.push("");
+  lines.push("【기본 구조 위험도 (수목·지형 요인)】");
+  detail.base.items.forEach((it) => {
+    lines.push(`${it.label} → +${it.score}점`);
+  });
+  lines.push(`→ 구조 위험도 합계: ${detail.base.total}점`);
+  lines.push("");
+  lines.push("【실시간 기상 영향】");
+
+  const w = detail.weather;
+  lines.push(
+    `최대 풍속 ${w.wind.v}m/s (계수 ${w.wind.factor}) → +${w.wind.score}점`
+  );
+  lines.push(
+    `최근 3일 누적 강우량 ${w.rain.r}mm (계수 ${w.rain.factor}) → +${w.rain.score}점`
+  );
+  lines.push(
+    `적설 ${w.snow.s}cm (계수 ${w.snow.factor}) → +${w.snow.score}점`
+  );
+  lines.push(`→ 기상 영향 합계: ${w.total}점`);
+  lines.push("");
+  lines.push("【최종 실시간 위험도】");
+  lines.push(
+    `구조 위험도 ${detail.base.total}점 + 기상 영향 ${w.total}점 = ${
+      detail.instant.total
+    }점 (상한 100점 기준)`
+  );
+
+  alert(lines.join("\n"));
+}
+
+// 전역에서 접근할 수 있도록 window에 노출
+window.recalcAllTreeRisks = recalcAllTreeRisks;
+window.renderRiskTop5 = renderRiskTop5;
+
+// ===== 콘솔용 테스트 함수 =====
+// 예) testRisk("YA-001", { wind_max: 16, rain_3d: 80, snow_cm: 0 });
+window.testRisk = function testRisk(treeId, overrideWeather) {
+  if (!Array.isArray(window.treeData)) {
+    console.warn("treeData 가 없습니다.");
+    return null;
   }
-  if (modal) {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeRiskExplainModal();
+
+  const original = window.treeData.find((t) => t.id === treeId);
+  if (!original) {
+    console.warn("해당 ID의 수목을 찾을 수 없습니다:", treeId);
+    return null;
+  }
+
+  const weatherBase = window.LSMS_WEATHER_TODAY || {};
+  const weather = Object.assign({}, weatherBase, overrideWeather || {});
+
+  // 원본 객체를 건드리지 않기 위해 얕은 복사
+  const copy = JSON.parse(JSON.stringify(original));
+  const result = computeTreeRisk(copy, weather);
+
+  console.log("=== testRisk 결과 ===");
+  console.log("treeId:", treeId);
+  console.log("weather:", weather);
+  console.log("risk_base:", result.risk_base);
+  console.log("risk_weather:", result.risk_weather);
+  console.log("risk_instant:", result.risk_instant, "level:", result.risk_level);
+  console.log("detail:", result._risk_detail);
+
+  return result;
+};
+
+// ===== LSMS 두뇌 서버 전도 위험 테스트 (기존 기능 유지) =====
+
+// LSMS 두뇌 서버에 전도 위험 계산 요청
+async function requestRiskFromCore(angle, slope, wind) {
+  const params = new URLSearchParams({
+    angle: String(angle),
+    slope: String(slope),
+    wind: String(wind),
+  });
+
+  const url = `http://127.0.0.1:5001/api/risk?${params.toString()}`;
+
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error("AI 서버 호출 실패 (status " + res.status + ")");
+  }
+  return res.json();
+}
+
+// 페이지 로드 후 버튼 이벤트 연결
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("btnRiskTest");
+  if (btn) {
+    btn.addEventListener("click", async () => {
+      const angle = Number(document.getElementById("inputAngle")?.value || 0);
+      const slope = Number(document.getElementById("inputSlope")?.value || 0);
+      const wind = Number(document.getElementById("inputWind")?.value || 0);
+      const box = document.getElementById("riskTestResult");
+
+      if (box) box.textContent = "계산 중...";
+
+      try {
+        const data = await requestRiskFromCore(angle, slope, wind);
+        if (!box) return;
+        box.textContent = `점수: ${data.score}, 등급: ${data.level}`;
+      } catch (err) {
+        console.error(err);
+        if (box) box.textContent = "서버 오류: " + err.message;
       }
     });
   }
 });
-
-// 전역으로 노출
-window.computeBaseRisk = computeBaseRisk;
-window.computeWeatherFactor = computeWeatherFactor;
-window.computeInstantRisk = computeInstantRisk;
-window.updateAllTreeRisks = updateAllTreeRisks;
-window.updateTreeMarkers = window.updateTreeMarkersByRisk;
-window.getTodayTopRisk = getTodayTopRisk;
-window.refreshRiskDashboard = refreshRiskDashboard;

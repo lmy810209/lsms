@@ -3,48 +3,6 @@
 let map;
 let markerLayer;
 let markersById = {};
-let MAP_LAYER_MODE = "all"; // 'all' | 'risk' | 'pest'
-const RISK_FILTER = { HIGH: true, MID: true, LOW: true };
-
-// 마커 드래그 상태 저장용
-const MARKER_DRAG_STATE = {}; // treeId -> { originalLatLng, editedLatLng }
-
-function handleMarkerDragEnd(e) {
-  const marker = e.target;
-  const treeId = marker && marker._lsmsTreeId;
-  if (!treeId) return;
-
-  if (!MARKER_DRAG_STATE[treeId]) {
-    MARKER_DRAG_STATE[treeId] = {
-      originalLatLng: marker.getLatLng(),
-      editedLatLng: null,
-    };
-  }
-  MARKER_DRAG_STATE[treeId].editedLatLng = marker.getLatLng();
-
-  const hint = document.getElementById("detailLocationHint");
-  if (hint) {
-    hint.classList.remove("hidden");
-  }
-}
-
-// 현재 사용 가능한 수목 배열을 안전하게 가져오는 헬퍼
-function getAllTreesForMap() {
-  if (typeof getTreeData === "function") {
-    return getTreeData() || [];
-  }
-  if (
-    window.LSMS &&
-    window.LSMS.outdoor &&
-    typeof window.LSMS.outdoor.getTrees === "function"
-  ) {
-    return window.LSMS.outdoor.getTrees() || [];
-  }
-  if (Array.isArray(window.treeData)) {
-    return window.treeData;
-  }
-  return [];
-}
 
 // 지도 초기화
 function mapInit() {
@@ -70,13 +28,12 @@ function mapInit() {
 
   // 지도 클릭 → 추가 모드일 때 새 수목 생성
   map.on("click", (e) => {
-    // addMode / addTree 는 trees.js에서 관리
-    if (typeof addMode === "undefined" || !addMode) return;
-    if (typeof addTree !== "function") return;
+    // addMode는 trees.js에서 관리
+    if (!addMode) return;
     addTree(e.latlng.lat, e.latlng.lng);
   });
 
-  // 초기 렌더
+  // 초기 렌더 (기본 treeData 사용)
   if (typeof renderTrees === "function") {
     renderTrees();
   } else {
@@ -91,175 +48,161 @@ function renderTreesOnMap() {
   markerLayer.clearLayers();
   markersById = {};
 
-  const trees = getAllTreesForMap();
-
-  trees.forEach((tree, index) => {
+  treeData.forEach((tree, index) => {
+    const color = getSpeciesColor(tree.species || "");
+    const ringColor = getRiskRingColor(tree);
     const number = index + 1;
-    const riskLevelRaw = (tree.risk_level || "LOW").toUpperCase();
-    let riskKey = "LOW";
-    if (riskLevelRaw === "HIGH") riskKey = "HIGH";
-    else if (riskLevelRaw === "MOD" || riskLevelRaw === "MID") riskKey = "MID";
-
-    // 위험도 필터 체크박스 상태 적용
-    if (!RISK_FILTER[riskKey]) return;
-
-    // 레이어 모드별 필터
-    if (MAP_LAYER_MODE === "pest") {
-      if (!(tree.disease && tree.disease.has_issue)) return;
-    }
-    // 'all' 또는 'risk' 모드는 현재 동일하게 전체 노출 (위험 지수는 색상/필터로만 표시)
-
-    let markerClass = "low";
-    if (riskKey === "HIGH") markerClass = "high";
-    else if (riskKey === "MID") markerClass = "mid";
+    const hasDisease = tree.disease && tree.disease.has_issue;
 
     const iconHtml = `
-      <div class="lsms-marker lsms-marker--${markerClass}">
-        <span>${number}</span>
+      <div style="
+        width:24px;height:24px;
+        border-radius:999px;
+        background:${color};
+        border:2px solid ${ringColor};
+        box-shadow:${hasDisease
+          ? "0 0 10px rgba(248,113,113,0.9)"
+          : "0 0 5px rgba(15,23,42,0.4)"};
+        display:flex;align-items:center;justify-content:center;
+        font-size:12px;font-weight:600;
+        color:#0f172a;
+      ">
+        ${number}
       </div>
     `;
 
     const icon = L.divIcon({
-      className: "lsms-marker-wrapper",
+      className: "",
       html: iconHtml,
-      iconSize: [26, 26],
-      iconAnchor: [13, 26],
-      popupAnchor: [0, -24]
+      iconSize: [24,24],
+      iconAnchor: [12,24],
+      popupAnchor: [0,-22]
     });
 
     const marker = L.marker([tree.lat, tree.lng], { icon }).addTo(markerLayer);
-    marker._lsmsTreeId = tree.id;
     markersById[tree.id] = marker;
 
-    // tree 객체에도 마커 참조 저장 (위험도 스타일링 등에서 활용 가능)
-    try {
-      tree.marker = marker;
-    } catch (e) {
-      // 읽기 전용일 수 있으므로 실패해도 무시
-    }
+    const diseaseText = tree.disease?.has_issue ? "있음" : "없음";
+
+    const popupHTML = `
+      <div class="lsms-popup">
+        <div class="lsms-popup-header">
+          <div class="lsms-popup-title">${tree.id} · ${tree.species}</div>
+          <div class="lsms-popup-sub">
+            ${tree.zone || "-"} · ${tree.type || "-"} · 상태 ${tree.status || "-"}
+          </div>
+        </div>
+        <div class="lsms-popup-body">
+          <div class="lsms-tab-nav">
+            <button class="lsms-tab-btn active" data-tab="basic">생육 정보</button>
+            <button class="lsms-tab-btn" data-tab="risk">전도 위험</button>
+            <button class="lsms-tab-btn" data-tab="manage">최근 관리</button>
+            <button class="lsms-tab-btn" data-tab="disease">병해충 이력</button>
+            <button class="lsms-tab-btn" data-tab="tag">태그·센서</button>
+            <button class="lsms-tab-btn" data-tab="photo">사진·메모</button>
+          </div>
+
+          <!-- 생육 정보 -->
+          <div class="lsms-tab-panel active" data-tab-panel="basic">
+            <div class="lsms-section-title">생육 정보</div>
+            <div class="lsms-row"><span>수고(H)</span><span>${tree.height ?? "-"} m</span></div>
+            <div class="lsms-row"><span>흉고 직경</span><span>${tree.dbh ?? "-"} cm</span></div>
+            <div class="lsms-row"><span>수관폭</span><span>${tree.crown ?? "-"} m</span></div>
+            <div class="lsms-row"><span>식재연도</span><span>${tree.planted_year ?? "-"}</span></div>
+            <div class="lsms-row"><span>건강도 점수</span><span>${tree.health_score ?? "-"}</span></div>
+          </div>
+
+          <!-- 전도 위험 -->
+          <div class="lsms-tab-panel" data-tab-panel="risk">
+            <div class="lsms-section-title">전도 위험</div>
+            <div class="lsms-row"><span>위험 등급</span><span>${tree.risk_level || "-"} (점수 ${tree.risk_score ?? "-"})</span></div>
+            <div class="lsms-row"><span>경사도</span><span>${tree.slope ?? "-"} %</span></div>
+            <div class="lsms-row"><span>수간 기울기</span><span>${tree.tilt ?? "-"} °</span></div>
+            <div class="lsms-row"><span>뿌리 들림</span><span>${tree.root_lift ? "있음" : "없음"}</span></div>
+            <div class="lsms-row"><span>배수 상태</span><span>${tree.drainage || "-"}</span></div>
+            <div class="lsms-row"><span>수간 균열</span><span>${tree.trunk_crack ? "있음" : "없음"}</span></div>
+            <div class="lsms-row"><span>수관 편중</span><span>${tree.crown_lean || "-"}</span></div>
+          </div>
+
+          <!-- 최근 관리 -->
+          <div class="lsms-tab-panel" data-tab-panel="manage">
+            <div class="lsms-section-title">최근 관리 이력</div>
+            <div class="lsms-row"><span>전정</span><span>${tree.history?.pruning || "-"}</span></div>
+            <div class="lsms-row"><span>방제</span><span>${tree.history?.pest || "-"}</span></div>
+            <div class="lsms-row"><span>시비</span><span>${tree.history?.fertilize || "-"}</span></div>
+            <div class="lsms-row"><span>점검</span><span>${tree.history?.inspection || "-"}</span></div>
+            <div class="lsms-note">메모: ${tree.history?.memo || "-"}</div>
+          </div>
+
+          <!-- 병해충 이력 -->
+          <div class="lsms-tab-panel" data-tab-panel="disease">
+            <div class="lsms-section-title">병해충 발생 이력</div>
+            <div class="lsms-row"><span>피해 발생 여부</span><span>${diseaseText}</span></div>
+            <div class="lsms-row"><span>최근 발생일</span><span>${tree.disease?.last_date || "-"}</span></div>
+            <div class="lsms-note">${tree.disease?.detail || "-"}</div>
+          </div>
+
+          <!-- 태그·센서 -->
+          <div class="lsms-tab-panel" data-tab-panel="tag">
+            <div class="lsms-section-title">QR / NFC / RFID · 센서</div>
+            <div class="lsms-row"><span>RFID tag</span><span>${tree.tag_id || "-"}</span></div>
+            <div class="lsms-row"><span>NFC ID</span><span>${tree.nfc_id || "-"}</span></div>
+            <div class="lsms-row"><span>QR 코드 ID</span><span>${tree.qr_id || "-"}</span></div>
+            <div class="lsms-row"><span>센서 ID</span><span>${tree.sensor_id || "-"}</span></div>
+          </div>
+
+          <!-- 사진·메모 -->
+          <div class="lsms-tab-panel" data-tab-panel="photo">
+            <div class="lsms-section-title">현장 사진 · 메모</div>
+            ${
+              tree.photo_url
+                ? `<img src="${tree.photo_url}" alt="현장 사진" class="lsms-photo">`
+                : `<div class="lsms-note">아직 등록된 사진이 없습니다.</div>`
+            }
+            <div class="lsms-note">작성: ${tree.created_by || "-"} / 최초등록 ${tree.created_at || "-"} / 최종수정 ${tree.updated_at || "-"}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    marker.bindPopup(popupHTML, {
+      maxWidth: 280,
+      className: "lsms-tree-popup",
+      autoPan: true,
+      autoPanPadding: [40,80]
+    });
 
     marker.on("click", () => {
       map.setView([tree.lat, tree.lng], 18, { animate: true });
-      if (typeof openTreeDetailPanel === "function") {
-        openTreeDetailPanel(tree, "view");
-      }
+      marker.openPopup();
     });
   });
 }
 
 // 특정 수목 아이디로 포커스
 function focusTree(treeId) {
-  const trees = getAllTreesForMap();
-  const tree = trees.find((t) => t.id === treeId);
+  const tree = treeData.find((t) => t.id === treeId);
   const marker = markersById[treeId];
   if (!tree || !marker || !map) return;
   map.setView([tree.lat, tree.lng], 18, { animate: true });
-  if (typeof openTreeDetailPanel === "function") {
-    openTreeDetailPanel(tree, "view");
-  }
+  marker.openPopup();
 }
 
-// 수목 마커 드래그 제어 API (trees.js에서 사용)
-window.LSMS_MAP_DRAG = {
-  enable(treeId) {
-    const marker = markersById[treeId];
-    if (!marker || !marker.dragging) return;
-    const latLng = marker.getLatLng();
-    MARKER_DRAG_STATE[treeId] = {
-      originalLatLng: latLng,
-      editedLatLng: null,
-    };
-    marker.dragging.enable();
-    marker.on("dragend", handleMarkerDragEnd);
-  },
-  apply(treeId) {
-    const marker = markersById[treeId];
-    const state = MARKER_DRAG_STATE[treeId];
-    if (marker && marker.dragging) {
-      marker.dragging.disable();
-      marker.off("dragend", handleMarkerDragEnd);
-    }
-    if (!state) return null;
-    const finalLatLng = state.editedLatLng || state.originalLatLng;
-    delete MARKER_DRAG_STATE[treeId];
-    const hint = document.getElementById("detailLocationHint");
-    if (hint) hint.classList.add("hidden");
-    return finalLatLng;
-  },
-  cancel(treeId) {
-    const marker = markersById[treeId];
-    const state = MARKER_DRAG_STATE[treeId];
-    if (marker && marker.dragging) {
-      if (state && state.originalLatLng) {
-        marker.setLatLng(state.originalLatLng);
-      }
-      marker.dragging.disable();
-      marker.off("dragend", handleMarkerDragEnd);
-    }
-    delete MARKER_DRAG_STATE[treeId];
-    const hint = document.getElementById("detailLocationHint");
-    if (hint) hint.classList.add("hidden");
-  },
-};
-
-// 위험도 수준에 따른 마커 강조 (HIGH 수목 등)
-window.updateTreeMarkersByRisk = function (treeData) {
-  const all = Array.isArray(treeData) ? treeData : getAllTreesForMap();
-  all.forEach((t) => {
-    const marker = t.marker || markersById[t.id];
-    if (!marker || !marker._icon) return;
-    marker._icon.classList.remove("blink");
-    if ((t.risk_level || "").toUpperCase() === "HIGH") {
-      marker._icon.classList.add("blink");
-    }
-  });
-};
-
-// 팝업 탭 버튼 전역 처리
+// 팝업 탭 버튼 전역 처리 (기존 document.addEventListener 코드)
 document.addEventListener("click", (event) => {
-  const tabEl = event.target.closest(".tree-popup-tab");
-  if (!tabEl) return;
+  const btn = event.target.closest(".lsms-tab-btn");
+  if (!btn) return;
 
-  const popup = tabEl.closest(".tree-popup");
+  const popup = btn.closest(".lsms-popup");
   if (!popup) return;
 
-  const tab = tabEl.getAttribute("data-tab");
-  const allTabs = popup.querySelectorAll(".tree-popup-tab");
-  const panels = popup.querySelectorAll(".tree-popup-section");
+  const tab = btn.getAttribute("data-tab");
+  const allBtns = popup.querySelectorAll(".lsms-tab-btn");
+  const panels = popup.querySelectorAll(".lsms-tab-panel");
 
-  allTabs.forEach((t) => {
-    t.classList.toggle("is-active", t === tabEl);
-  });
+  allBtns.forEach((b) => b.classList.toggle("active", b === btn));
   panels.forEach((p) => {
     const panelTab = p.getAttribute("data-tab-panel");
-    p.style.display = panelTab === tab ? "" : "none";
-  });
-});
-
-// 레이어/위험도 필터 버튼 이벤트
-document.addEventListener("DOMContentLoaded", () => {
-  const layerButtons = document.querySelectorAll(".pill-toggle[data-layer]");
-  layerButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      layerButtons.forEach((b) =>
-        b.classList.toggle("is-active", b === btn)
-      );
-      MAP_LAYER_MODE = btn.getAttribute("data-layer") || "risk";
-      renderTreesOnMap();
-    });
-  });
-
-  const legendCheckboxes = document.querySelectorAll(
-    ".legend-checkbox[data-risk]"
-  );
-  legendCheckboxes.forEach((chk) => {
-    chk.addEventListener("change", () => {
-      const key = (chk.getAttribute("data-risk") || "").toUpperCase();
-      let norm = key;
-      if (norm === "MOD") norm = "MID";
-      if (!RISK_FILTER.hasOwnProperty(norm)) return;
-      RISK_FILTER[norm] = chk.checked;
-      renderTreesOnMap();
-    });
+    p.classList.toggle("active", panelTab === tab);
   });
 });

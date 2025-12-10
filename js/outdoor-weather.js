@@ -1,7 +1,16 @@
 // ===== 날씨 패널 =====
 
-// 전역으로 오늘 날씨 요약 저장 (위험도 계산용)
-window.LSMS_WEATHER_TODAY = window.LSMS_WEATHER_TODAY || null;
+// 전도 위험 계산용 오늘 기상 요약 (기본값)
+// wind_avg, wind_max, rain_3d, snow_cm, month (1~12)
+window.LSMS_WEATHER_TODAY =
+  window.LSMS_WEATHER_TODAY ||
+  {
+    wind_avg: 3.0,
+    wind_max: 6.0,
+    rain_3d: 0.0,
+    snow_cm: 0.0,
+    month: new Date().getMonth() + 1,
+  };
 
 function updateWeatherUI(weather) {
   const tempEl  = document.getElementById("todayTemp");
@@ -108,19 +117,18 @@ async function fetchWeather() {
     });
 
     const weatherData = { today, forecast };
-    // 위험도 계산용 요약 값 저장
-    window.LSMS_WEATHER_TAY = undefined;
+
+    // 전도 위험 계산용 오늘 기상 요약 갱신
     window.LSMS_WEATHER_TODAY = {
       wind_avg: today.wind,
       wind_max: today.gust,
-      // TODO: OpenWeather에서 강수/적설 값 매핑 (임시 0)
-      rain_mm: (cur.rain && (cur.rain["1h"] || cur.rain["3h"])) || 0,
-      snow_cm: (cur.snow && (cur.snow["1h"] || cur.snow["3h"]) / 10) || 0,
+      // TODO: OpenWeather 예보를 활용해 3일 누적 강우량 계산 가능
+      rain_3d: 0.0,
+      snow_cm: 0.0,
+      month: new Date().getMonth() + 1,
     };
+
     updateWeatherUI(weatherData);
-    if (typeof window.refreshRiskDashboard === "function") {
-      window.refreshRiskDashboard();
-    }
   } catch (err) {
     console.warn("날씨 불러오기 실패, 콘솔 확인:", err);
 
@@ -135,16 +143,16 @@ async function fetchWeather() {
         { label: "4일 후", dateLabel: "", desc: "약한 비",   max: 25, min: 21, wind: 4 }
       ]
     };
+    // 실패 시에도 전도 위험 계산용 기본값 세팅
     window.LSMS_WEATHER_TODAY = {
       wind_avg: fallback.today.wind,
       wind_max: fallback.today.gust,
-      rain_mm: 0,
-      snow_cm: 0,
+      rain_3d: 0.0,
+      snow_cm: 0.0,
+      month: new Date().getMonth() + 1,
     };
+
     updateWeatherUI(fallback);
-    if (typeof window.refreshRiskDashboard === "function") {
-      window.refreshRiskDashboard();
-    }
   }
 }
 
