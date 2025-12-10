@@ -3,7 +3,7 @@
 let map;
 let markerLayer;
 let markersById = {};
-let MAP_LAYER_MODE = "risk"; // 'risk' | 'pest' | 'zone'
+let MAP_LAYER_MODE = "all"; // 'all' | 'risk' | 'pest'
 const RISK_FILTER = { HIGH: true, MID: true, LOW: true };
 
 // 지도 초기화
@@ -30,8 +30,9 @@ function mapInit() {
 
   // 지도 클릭 → 추가 모드일 때 새 수목 생성
   map.on("click", (e) => {
-    // addMode는 trees.js에서 관리
-    if (!addMode) return;
+    // addMode / addTree 는 trees.js에서 관리
+    if (typeof addMode === "undefined" || !addMode) return;
+    if (typeof addTree !== "function") return;
     addTree(e.latlng.lat, e.latlng.lng);
   });
 
@@ -64,7 +65,7 @@ function renderTreesOnMap() {
     if (MAP_LAYER_MODE === "pest") {
       if (!(tree.disease && tree.disease.has_issue)) return;
     }
-    // zone 모드는 현재는 필터 없이 전체 노출 (향후 확장용)
+    // 'all' 또는 'risk' 모드는 현재 동일하게 전체 노출 (위험 지수는 색상/필터로만 표시)
 
     let markerClass = "low";
     if (riskKey === "HIGH") markerClass = "high";
