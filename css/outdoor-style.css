@@ -277,6 +277,10 @@
   color: #b91c1c;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .details-hint {
   margin-top: 4px;
   font-size: 11px;
