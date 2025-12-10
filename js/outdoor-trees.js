@@ -79,6 +79,17 @@ let addMode = false;
 // 현재 상세 패널에서 보고/수정 중인 수목 index
 let currentTreeIndex = null;
 
+// 수목 상세 패널 관련
+let detailPanel = null;
+let detailSpans = {};
+let detailInputs = {};
+let detailEditBtn = null;
+let detailSaveBtn = null;
+let detailCancelBtn = null;
+let detailDeleteBtn = null;
+let detailCloseBtn = null;
+let detailEditMode = false;
+
 // ===== 리스트 초기화 =====
 function treesInit() {
   treeListBody = document.getElementById("treeListBody");
@@ -95,6 +106,197 @@ function treesInit() {
   treeAddHeightEl = document.getElementById("treeAddHeight");
   treeAddDbhEl = document.getElementById("treeAddDbh");
   treeAddCrownEl = document.getElementById("treeAddCrown");
+
+  // 수목 상세 패널 요소
+  detailPanel = document.getElementById("treeDetailsPanel");
+  if (detailPanel) {
+    detailSpans = {
+      id: document.getElementById("detailTreeId"),
+      species: document.getElementById("detailSpecies"),
+      zone: document.getElementById("detailZone"),
+      height: document.getElementById("detailHeight"),
+      dbh: document.getElementById("detailDbh"),
+      crown: document.getElementById("detailCrown"),
+      year: document.getElementById("detailYear"),
+      health: document.getElementById("detailHealth"),
+      memo: document.getElementById("detailMemo"),
+    };
+    detailInputs = {
+      id: document.getElementById("detailTreeIdInput"),
+      species: document.getElementById("detailSpeciesInput"),
+      zone: document.getElementById("detailZoneInput"),
+      height: document.getElementById("detailHeightInput"),
+      dbh: document.getElementById("detailDbhInput"),
+      crown: document.getElementById("detailCrownInput"),
+      year: document.getElementById("detailYearInput"),
+      health: document.getElementById("detailHealthInput"),
+      memo: document.getElementById("detailMemoInput"),
+    };
+
+    detailEditBtn = document.getElementById("btnEditTree");
+    detailSaveBtn = document.getElementById("btnSaveTree");
+    detailCancelBtn = document.getElementById("btnCancelEdit");
+    detailDeleteBtn = document.getElementById("btnDeleteTree");
+    detailCloseBtn = document.getElementById("btnCloseTreeDetails");
+
+    const setDetailMode = (edit) => {
+      detailEditMode = edit;
+      if (!detailPanel) return;
+
+      if (detailEditBtn) {
+        detailEditBtn.classList.toggle("hidden", edit);
+        // 작업자/게스트는 편집 버튼 숨김
+        if (
+          typeof CURRENT_USER_ROLE !== "undefined" &&
+          CURRENT_USER_ROLE !== "admin"
+        ) {
+          detailEditBtn.style.display = "none";
+        }
+      }
+      if (detailSaveBtn) {
+        detailSaveBtn.classList.toggle("hidden", !edit);
+      }
+      if (detailCancelBtn) {
+        detailCancelBtn.classList.toggle("hidden", !edit);
+      }
+
+      Object.keys(detailSpans).forEach((key) => {
+        const span = detailSpans[key];
+        const input = detailInputs[key];
+        if (!span || !input) return;
+        if (edit && key !== "id") {
+          // ID는 읽기 전용 유지
+          span.classList.add("hidden");
+          input.classList.remove("hidden");
+        } else {
+          span.classList.remove("hidden");
+          input.classList.add("hidden");
+        }
+      });
+    };
+
+    const closeDetails = () => {
+      if (detailPanel) {
+        detailPanel.classList.add("hidden");
+      }
+      detailEditMode = false;
+      pendingAddLat = null;
+      pendingAddLng = null;
+    };
+
+    if (detailCloseBtn) {
+      detailCloseBtn.addEventListener("click", closeDetails);
+    }
+
+    if (detailEditBtn) {
+      detailEditBtn.addEventListener("click", () => {
+        if (
+          typeof CURRENT_USER_ROLE !== "undefined" &&
+          CURRENT_USER_ROLE !== "admin"
+        ) {
+          alert("편집 권한이 없습니다.");
+          return;
+        }
+        if (currentTreeIndex == null) return;
+        const data = getTreeData();
+        if (currentTreeIndex < 0 || currentTreeIndex >= data.length) return;
+        const t = data[currentTreeIndex];
+
+        // 입력 값에 현재 값을 채워 넣기
+        if (detailInputs.id) detailInputs.id.value = t.id || "";
+        if (detailInputs.species) detailInputs.species.value = t.species || "";
+        if (detailInputs.zone) detailInputs.zone.value = t.zone || "";
+        if (detailInputs.height)
+          detailInputs.height.value = t.height ?? "";
+        if (detailInputs.dbh) detailInputs.dbh.value = t.dbh ?? "";
+        if (detailInputs.crown) detailInputs.crown.value = t.crown ?? "";
+        if (detailInputs.year)
+          detailInputs.year.value = t.planted_year ?? "";
+        if (detailInputs.health)
+          detailInputs.health.value = t.health_score ?? "";
+        if (detailInputs.memo)
+          detailInputs.memo.value =
+            (t.history && t.history.memo) || "";
+
+        setDetailMode(true);
+      });
+    }
+
+    if (detailCancelBtn) {
+      detailCancelBtn.addEventListener("click", () => {
+        setDetailMode(false);
+      });
+    }
+
+    if (detailSaveBtn) {
+      detailSaveBtn.addEventListener("click", () => {
+        if (
+          typeof CURRENT_USER_ROLE !== "undefined" &&
+          CURRENT_USER_ROLE !== "admin"
+        ) {
+          alert("편집 권한이 없습니다.");
+          return;
+        }
+        if (currentTreeIndex == null) return;
+        const data = getTreeData();
+        if (currentTreeIndex < 0 || currentTreeIndex >= data.length) return;
+        const t = data[currentTreeIndex];
+
+        if (detailInputs.species)
+          t.species = detailInputs.species.value;
+        if (detailInputs.zone) t.zone = detailInputs.zone.value;
+        if (detailInputs.height) {
+          const v = detailInputs.height.value;
+          t.height = v ? Number(v) : null;
+        }
+        if (detailInputs.dbh) {
+          const v = detailInputs.dbh.value;
+          t.dbh = v ? Number(v) : null;
+        }
+        if (detailInputs.crown) {
+          const v = detailInputs.crown.value;
+          t.crown = v ? Number(v) : null;
+        }
+        if (detailInputs.year) {
+          const v = detailInputs.year.value;
+          t.planted_year = v ? Number(v) : null;
+        }
+        if (detailInputs.health) {
+          const v = detailInputs.health.value;
+          t.health_score = v ? Number(v) : null;
+        }
+        if (!t.history) t.history = {};
+        if (detailInputs.memo) {
+          t.history.memo = detailInputs.memo.value;
+        }
+        t.updated_at = new Date().toISOString().slice(0, 10);
+
+        setTreeData(data);
+        openTreeDetailPanel(t, "view");
+      });
+    }
+
+    if (detailDeleteBtn) {
+      detailDeleteBtn.addEventListener("click", () => {
+        if (
+          typeof CURRENT_USER_ROLE !== "undefined" &&
+          CURRENT_USER_ROLE !== "admin"
+        ) {
+          alert("삭제는 관리자만 가능합니다.");
+          return;
+        }
+        if (currentTreeIndex == null) return;
+        const data = getTreeData();
+        if (currentTreeIndex < 0 || currentTreeIndex >= data.length) return;
+        const target = data[currentTreeIndex];
+        if (!confirm(`${target.id} 수목을 삭제할까요?`)) return;
+        const next = data.filter((t) => t.id !== target.id);
+        currentTreeIndex = null;
+        setTreeData(next);
+        closeDetails();
+      });
+    }
+  }
 
   // 초기에는 항상 추가 모드/모달을 완전히 끈 상태로 시작
   addMode = false;
@@ -499,89 +701,62 @@ function renderTrees() {
   }
 }
 
-// ===== 상세 패널 열기/편집 모드 제어 =====
 function openTreeDetailPanel(tree, mode = "view") {
-  const titleEl = document.getElementById("treeTitle");
-  const statusEl = document.getElementById("treeStatus");
+  if (!detailPanel || !detailSpans) return;
 
-  const idEl = document.getElementById("treeId");
-  const speciesEl = document.getElementById("treeSpecies");
-  const zoneEl = document.getElementById("treeZone");
-  const typeEl = document.getElementById("treeType");
-  const statusSel = document.getElementById("treeStatusSelect");
+  const all = getTreeData();
+  const index = all.findIndex((t) => t.id === tree.id);
+  currentTreeIndex = index >= 0 ? index : null;
 
-  const heightEl = document.getElementById("treeHeight");
-  const dbhEl = document.getElementById("treeDbh");
-  const crownEl = document.getElementById("treeCrown");
-  const memoEl = document.getElementById("treeMemo");
+  // 보기 모드로 전환
+  detailEditMode = false;
+  detailPanel.classList.remove("hidden");
 
-  if (!idEl) return; // 패널이 없으면 아무 것도 안 함
+  if (detailSpans.id) detailSpans.id.textContent = tree.id || "-";
+  if (detailSpans.species)
+    detailSpans.species.textContent = tree.species || "-";
+  if (detailSpans.zone) detailSpans.zone.textContent = tree.zone || "-";
+  if (detailSpans.height)
+    detailSpans.height.textContent =
+      (tree.height != null ? tree.height + " m" : "-");
+  if (detailSpans.dbh)
+    detailSpans.dbh.textContent =
+      (tree.dbh != null ? tree.dbh + " cm" : "-");
+  if (detailSpans.crown)
+    detailSpans.crown.textContent =
+      (tree.crown != null ? tree.crown + " m" : "-");
+  if (detailSpans.year)
+    detailSpans.year.textContent =
+      tree.planted_year != null ? tree.planted_year : "-";
+  if (detailSpans.health)
+    detailSpans.health.textContent =
+      tree.health_score != null ? tree.health_score : "-";
+  if (detailSpans.memo)
+    detailSpans.memo.textContent =
+      (tree.history && tree.history.memo) || "-";
 
-  idEl.value = tree.id || "";
-  speciesEl.value = tree.species || "";
-  zoneEl.value = tree.zone || "";
-  typeEl.value = tree.type || "교목";
-  statusSel.value = tree.status || "양호";
-
-  heightEl.value = tree.height ?? "";
-  dbhEl.value = tree.dbh ?? "";
-  crownEl.value = tree.crown ?? "";
-  memoEl.value = (tree.history && tree.history.memo) || "";
-
-  titleEl.textContent =
-    (tree.id || "-") + (tree.species ? " · " + tree.species : "");
-  statusEl.textContent = (tree.type || "-") + " · " + (tree.status || "-");
-
-  const editable =
-    (mode === "edit" || mode === "new") &&
-    typeof CURRENT_USER_ROLE !== "undefined" &&
-    CURRENT_USER_ROLE === "admin";
-
-  setTreeFormEditable(editable);
-
-  const btnEdit = document.getElementById("btnTreeEdit");
-  const btnSave = document.getElementById("btnTreeSaveDetail");
-  const btnCancel = document.getElementById("btnTreeCancel");
-
-  if (btnEdit && btnSave && btnCancel) {
-    if (editable) {
-      btnEdit.style.display = "none";
-      btnSave.style.display = "inline-flex";
-      btnCancel.style.display = "inline-flex";
-    } else {
-      btnEdit.style.display =
-        typeof CURRENT_USER_ROLE !== "undefined" &&
-        CURRENT_USER_ROLE === "admin"
-          ? "inline-flex"
-          : "none";
-      btnSave.style.display = "none";
-      btnCancel.style.display = "none";
-    }
-  }
-
-  const panel = document.querySelector(".tree-detail-panel");
-  if (panel) {
-    panel.classList.add("open"); // CSS에서 필요하면 .open 활용
-  }
-}
-
-function setTreeFormEditable(editable) {
-  const inputs = document.querySelectorAll(
-    ".tree-detail-panel .field-input, .tree-detail-panel textarea"
-  );
-  inputs.forEach((el) => {
-    if (el.id === "treeId") {
-      el.readOnly = true; // ID는 항상 읽기 전용
-      return;
-    }
-
-    if (el.tagName === "SELECT") {
-      el.disabled = !editable;
-    } else {
-      el.readOnly = !editable;
-    }
-    el.classList.toggle("field-readonly", !editable);
+  // 보기 모드에서 입력 필드는 숨김
+  Object.keys(detailSpans).forEach((key) => {
+    const span = detailSpans[key];
+    const input = detailInputs[key];
+    if (!span || !input) return;
+    span.classList.remove("hidden");
+    input.classList.add("hidden");
   });
+
+  if (detailEditBtn) {
+    detailEditBtn.classList.remove("hidden");
+    if (
+      typeof CURRENT_USER_ROLE !== "undefined" &&
+      CURRENT_USER_ROLE !== "admin"
+    ) {
+      detailEditBtn.style.display = "none";
+    } else {
+      detailEditBtn.style.display = "";
+    }
+  }
+  if (detailSaveBtn) detailSaveBtn.classList.add("hidden");
+  if (detailCancelBtn) detailCancelBtn.classList.add("hidden");
 }
 
 // ===== 서버 연동 (원하면 사용) =====

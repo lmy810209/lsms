@@ -282,102 +282,66 @@
         </aside>
       </div>
 
-      <!-- ===== 수목 상세 정보/편집 패널 (기존 기능 유지) ===== -->
-      <aside class="tree-detail-panel">
-        <div class="tree-detail-header">
-          <div id="treeTitle">-</div>
-          <div id="treeStatus" class="tree-status-text">-</div>
+      <!-- ===== 수목 상세 패널 (지도 오른쪽 고정) ===== -->
+      <div id="treeDetailsPanel" class="details-panel hidden">
+        <div class="details-header">
+          <div class="details-title">수목 상세 정보</div>
+          <button type="button" class="details-close-btn" id="btnCloseTreeDetails">×</button>
         </div>
-
-        <div class="tree-detail-tabs">
-          <button class="tab active" type="button">생육 정보</button>
-          <button class="tab" type="button">전도 위험</button>
-          <button class="tab" type="button">최근 관리</button>
-        </div>
-
-        <div class="tree-detail-body">
-          <div class="tree-field">
-            <label class="field-label" for="treeId">수목 ID</label>
-            <div class="field-input-wrap">
-              <input id="treeId" class="field-input" readonly />
-            </div>
+        <div class="details-body">
+          <div class="details-field">
+            <label>수목 ID</label>
+            <span id="detailTreeId"></span>
+            <input id="detailTreeIdInput" class="details-input hidden" readonly />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeSpecies">수종명</label>
-            <div class="field-input-wrap">
-              <input id="treeSpecies" class="field-input" />
-            </div>
+          <div class="details-field">
+            <label>수종명</label>
+            <span id="detailSpecies"></span>
+            <input id="detailSpeciesInput" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeZone">구역</label>
-            <div class="field-input-wrap">
-              <input id="treeZone" class="field-input" />
-            </div>
+          <div class="details-field">
+            <label>구역</label>
+            <span id="detailZone"></span>
+            <input id="detailZoneInput" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeType">유형</label>
-            <div class="field-input-wrap">
-              <select id="treeType" class="field-input">
-                <option value="교목">교목</option>
-                <option value="관목">관목</option>
-                <option value="지피">지피</option>
-              </select>
-            </div>
+          <div class="details-field">
+            <label>수고(H)</label>
+            <span id="detailHeight"></span>
+            <input id="detailHeightInput" type="number" step="0.1" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeStatusSelect">상태</label>
-            <div class="field-input-wrap">
-              <select id="treeStatusSelect" class="field-input">
-                <option value="양호">양호</option>
-                <option value="주의">주의</option>
-                <option value="불량">불량</option>
-              </select>
-            </div>
+          <div class="details-field">
+            <label>흉고 직경</label>
+            <span id="detailDbh"></span>
+            <input id="detailDbhInput" type="number" step="0.1" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeHeight">수고(H)</label>
-            <div class="field-input-wrap">
-              <input id="treeHeight" type="number" step="0.1" class="field-input" />
-              <span class="field-unit">m</span>
-            </div>
+          <div class="details-field">
+            <label>수관 폭</label>
+            <span id="detailCrown"></span>
+            <input id="detailCrownInput" type="number" step="0.1" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeDbh">흉고 직경</label>
-            <div class="field-input-wrap">
-              <input id="treeDbh" type="number" step="0.1" class="field-input" />
-              <span class="field-unit">cm</span>
-            </div>
+          <div class="details-field">
+            <label>식재연도</label>
+            <span id="detailYear"></span>
+            <input id="detailYearInput" type="number" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeCrown">수관 폭</label>
-            <div class="field-input-wrap">
-              <input id="treeCrown" type="number" step="0.1" class="field-input" />
-              <span class="field-unit">m</span>
-            </div>
+          <div class="details-field">
+            <label>건강 점수</label>
+            <span id="detailHealth"></span>
+            <input id="detailHealthInput" type="number" class="details-input hidden" />
           </div>
-
-          <div class="tree-field">
-            <label class="field-label" for="treeMemo">메모</label>
-            <div class="field-input-wrap">
-              <textarea id="treeMemo" class="field-input" rows="2"></textarea>
-            </div>
+          <div class="details-field details-field-memo">
+            <label>메모</label>
+            <span id="detailMemo"></span>
+            <textarea id="detailMemoInput" rows="3" class="details-input hidden"></textarea>
           </div>
         </div>
-
-        <div class="tree-actions">
-          <button id="btnTreeEdit" class="btn-secondary" type="button">수정</button>
-          <button id="btnTreeSaveDetail" class="btn-primary" type="button">저장</button>
-          <button id="btnTreeCancel" class="btn-ghost" type="button">취소</button>
+        <div class="details-footer">
+          <button id="btnEditTree" type="button" class="btn btn-sm btn-ghost">편집</button>
+          <button id="btnSaveTree" type="button" class="btn btn-sm btn-primary hidden">저장</button>
+          <button id="btnCancelEdit" type="button" class="btn btn-sm btn-ghost hidden">취소</button>
+          <button id="btnDeleteTree" type="button" class="btn btn-sm btn-ghost details-danger">삭제</button>
         </div>
-      </aside>
-      <!-- ===== 수목 상세 패널 끝 ===== -->
+      </div>
     </section>
 
     <!-- 2) 전도 위험 수목 모니터링 -->
