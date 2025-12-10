@@ -128,7 +128,29 @@ function treesInit() {
         alert("수목 추가는 관리자만 가능합니다.");
         return;
       }
-      setAddMode(!addMode);
+      // 버튼으로 수목을 추가할 때는 바로 모달을 연다.
+      // (지도 클릭 기반 추가 모드는 사용하지 않음)
+      addMode = false;
+      if (addHint) {
+        addHint.textContent = "";
+      }
+      pendingAddLat = null;
+      pendingAddLng = null;
+
+      if (!treeAddModal) {
+        alert("수목 등록 모달을 찾을 수 없습니다.");
+        return;
+      }
+
+      if (treeAddIdEl) treeAddIdEl.value = "";
+      if (treeAddSpeciesEl) treeAddSpeciesEl.value = "";
+      if (treeAddZoneEl) treeAddZoneEl.value = "";
+      if (treeAddYearEl) treeAddYearEl.value = "";
+      if (treeAddHeightEl) treeAddHeightEl.value = "";
+      if (treeAddDbhEl) treeAddDbhEl.value = "";
+      if (treeAddCrownEl) treeAddCrownEl.value = "";
+
+      treeAddModal.hidden = false;
     });
   }
 
@@ -169,11 +191,6 @@ function treesInit() {
         alert("수목 등록은 관리자만 가능합니다.");
         return;
       }
-      if (pendingAddLat == null || pendingAddLng == null) {
-        alert("지도에서 위치를 먼저 선택해 주세요.");
-        return;
-      }
-
       const id = (treeAddIdEl?.value || "").trim();
       if (!id) {
         alert("수목 ID를 입력해 주세요.");
@@ -201,14 +218,28 @@ function treesInit() {
 
       const today = new Date().toISOString().slice(0, 10);
 
+      // 위치 정보가 없으면, 기존 수목 중 첫 번째 위치를 기준으로
+      // 소폭 랜덤 오프셋을 주어 배치한다. (데모용 기본 동작)
+      let lat = pendingAddLat;
+      let lng = pendingAddLng;
+      if (lat == null || lng == null) {
+        if (base.length > 0 && typeof base[0].lat === "number" && typeof base[0].lng === "number") {
+          lat = base[0].lat + (Math.random() - 0.5) * 0.0003;
+          lng = base[0].lng + (Math.random() - 0.5) * 0.0003;
+        } else {
+          lat = 37.4643;
+          lng = 127.0428;
+        }
+      }
+
       const newTree = {
         id,
         species,
         type: "교목",
         status: "양호",
         zone,
-        lat: pendingAddLat,
-        lng: pendingAddLng,
+        lat,
+        lng,
         height,
         dbh,
         crown,
