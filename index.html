@@ -192,63 +192,85 @@
   </div>
 
   <script>
-    function handleLogin() {
+    async function handleLogin() {
       const site  = document.getElementById('site').value;
       const scope = document.querySelector('input[name="scope"]:checked').value;
       const id    = document.getElementById('userId').value.trim();
       const pw    = document.getElementById('userPw').value.trim();
 
-      // 데모 계정
-      const isAdmin  = id === "admin"  && pw === "1234";
-      const isWorker = id === "worker" && pw === "1234";
-
-      if (!isAdmin && !isWorker) {
-        alert("아이디 또는 비밀번호가 올바르지 않습니다.");
+      if (!id || !pw) {
+        alert("아이디와 비밀번호를 모두 입력해 주세요.");
         return;
       }
 
-      // 로그인 정보 저장
-      localStorage.setItem("lsmsUser", JSON.stringify({
-        id,
-        role: isAdmin ? "admin" : "worker",
-        site,
-        scope,
-        loggedAt: new Date().toISOString()
-      }));
+      try {
+        const res = await fetch("/api/login.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id,
+            password: pw,
+            site,
+            scope
+          })
+        });
 
-      let target = "";
+        const data = await res.json();
 
-      /* =========================
-         🏢 실내조경 라우팅
-      ========================== */
-      if (scope === "indoor") {
-        if (site === "yangjae") {
-          target = "/indoor/index.html";        // 양재 HQ 실내조경
-        } else if (site === "gangnam") {
-          // 강남 실내조경 페이지 따로 만들면 여기 경로만 바꾸면 됨
-          target = "/indoor/index.html";
-        } else {
-          alert("해당 사업장의 실내조경 화면이 준비되지 않았습니다.");
+        if (!res.ok || !data.ok) {
+          alert(data.error || "로그인에 실패했습니다.");
           return;
         }
-      }
 
-      /* =========================
-         🌳 실외조경 라우팅
-      ========================== */
-      if (scope === "outdoor") {
-        if (site === "yangjae") {
-          target = "/outdoor/index.html";
-        } else if (site === "gangnam") {
-          target = "/outdoor/gangnam/index.html"; // 준비 예정
-        } else {
-          alert("해당 사업장의 실외조경 화면이 준비되지 않았습니다.");
-          return;
+        const user = data.user;
+
+        // 로그인 정보 저장
+        localStorage.setItem("lsmsUser", JSON.stringify({
+          id: user.id,
+          name: user.name || "",
+          role: user.role || "worker",
+          site: user.site || site,
+          scope: user.scope || scope,
+          loggedAt: new Date().toISOString()
+        }));
+
+        let target = "";
+
+        /* =========================
+           🏢 실내조경 라우팅
+        ========================== */
+        if (scope === "indoor") {
+          if (site === "yangjae") {
+            target = "/indoor/index.html";        // 양재 HQ 실내조경
+          } else if (site === "gangnam") {
+            // 강남 실내조경 페이지 따로 만들면 여기 경로만 바꾸면 됨
+            target = "/indoor/index.html";
+          } else {
+            alert("해당 사업장의 실내조경 화면이 준비되지 않았습니다.");
+            return;
+          }
         }
-      }
 
-      // 최종 이동
-      window.location.href = target;
+        /* =========================
+           🌳 실외조경 라우팅
+        ========================== */
+        if (scope === "outdoor") {
+          if (site === "yangjae") {
+            target = "/outdoor/index.html";
+          } else if (site === "gangnam") {
+            target = "/outdoor/gangnam/index.html"; // 준비 예정
+          } else {
+            alert("해당 사업장의 실외조경 화면이 준비되지 않았습니다.");
+            return;
+          }
+        }
+
+        // 최종 이동
+        window.location.href = target;
+      } catch (e) {
+        console.error("login error", e);
+        alert("로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+      }
     }
   </script>
 

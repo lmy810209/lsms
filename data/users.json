@@ -1,0 +1,22 @@
+[
+  {
+    "id": "admin",
+    "name": "사이트 관리자",
+    "password": "1234",
+    "role": "admin",
+    "site": "yangjae",
+    "scopes": ["indoor", "outdoor"],
+    "active": true
+  },
+  {
+    "id": "worker",
+    "name": "현장 작업자",
+    "password": "1234",
+    "role": "worker",
+    "site": "yangjae",
+    "scopes": ["outdoor"],
+    "active": true
+  }
+]
+
+
