@@ -950,8 +950,8 @@ async function saveTreesToServer() {
     const source = getTreeData();
     const plainTrees = Array.isArray(source)
       ? source.map((t) => {
-          // Leaflet 마커 등 순환 참조 가능한 객체는 제거
-          const { marker, ...rest } = t || {};
+          // Leaflet 마커, 분석용 임시 필드 등 순환/비저장 필드는 제거
+          const { marker, _riskDetail, ...rest } = t || {};
           return rest;
         })
       : [];

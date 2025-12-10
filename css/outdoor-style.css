@@ -637,6 +637,75 @@
   color: #9ca3af;
 }
 
+/* 위험도 요인 분석 모달 */
+.risk-explain-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.risk-explain-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.risk-explain-sub {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.risk-explain-score {
+  font-size: 18px;
+  font-weight: 700;
+  color: #facc15;
+}
+
+.risk-explain-section {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.risk-explain-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #e5e7eb;
+}
+
+.risk-explain-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.risk-explain-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.risk-explain-item span:last-child {
+  font-weight: 600;
+}
+
+.risk-explain-item-empty {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.risk-explain-footer {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #e5e7eb;
+}
+
 .tree-popup {
   min-width: 260px;
   max-width: 320px;

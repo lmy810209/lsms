@@ -529,6 +529,26 @@
         </div>
       </div>
     </div>
+
+    <!-- ===== 위험도 요인 분석 모달 (TOP5 클릭 시) ===== -->
+    <div class="lsms-modal-backdrop" id="riskExplainModal" hidden>
+      <div class="lsms-modal">
+        <div class="lsms-modal-header">
+          <h2 class="lsms-modal-title">위험도 요인 분석</h2>
+          <button type="button" class="lsms-modal-close" id="riskExplainClose">×</button>
+        </div>
+        <div class="lsms-modal-body">
+          <div class="risk-explain-header">
+            <div>
+              <div id="riskExplainTitle" class="risk-explain-title"></div>
+              <div id="riskExplainSubtitle" class="risk-explain-sub"></div>
+            </div>
+            <div id="riskExplainScore" class="risk-explain-score"></div>
+          </div>
+          <div id="riskExplainContent" class="risk-explain-content"></div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- ========== JS 로딩 (OUTDOOR 전용) ========== -->
