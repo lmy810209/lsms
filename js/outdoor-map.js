@@ -1,5 +1,10 @@
 // ===== 지도 / 마커 / 팝업 =====
 
+// 과거 코드에서 전역 treeData를 직접 사용하던 흔적이 있어,
+// 혹시라도 아직 window.treeData만 있고 심벌이 없는 경우를 막기 위해
+// 안전하게 기본값을 한 번 잡아 둔다.
+var treeData = window.treeData || [];
+
 let map;
 let markerLayer;
 let markersById = {};
@@ -48,7 +53,11 @@ function renderTreesOnMap() {
   markerLayer.clearLayers();
   markersById = {};
 
-  treeData.forEach((tree, index) => {
+  // 안전하게 현재 수목 데이터 가져오기
+  const allTrees =
+    typeof getTreeData === "function" ? getTreeData() : window.treeData || [];
+
+  allTrees.forEach((tree, index) => {
     const color = getSpeciesColor(tree.species || "");
     const ringColor = getRiskRingColor(tree);
     const number = index + 1;
@@ -181,7 +190,9 @@ function renderTreesOnMap() {
 
 // 특정 수목 아이디로 포커스
 function focusTree(treeId) {
-  const tree = treeData.find((t) => t.id === treeId);
+  const allTrees =
+    typeof getTreeData === "function" ? getTreeData() : window.treeData || [];
+  const tree = allTrees.find((t) => t.id === treeId);
   const marker = markersById[treeId];
   if (!tree || !marker || !map) return;
   map.setView([tree.lat, tree.lng], 18, { animate: true });
