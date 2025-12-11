@@ -22,23 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function initAdminPage() {
-  // 1) 로그인 / 관리자 체크
+  // 1) 로그인 / 관리자 체크 (기본 로그인/스코프 체크는 lsms-auth.js 에서 수행)
   const userLabel = document.getElementById("adminUserLabel");
-  const raw = localStorage.getItem("lsmsUser");
-  if (!raw) {
-    alert("로그인 정보가 없습니다. 로그인 페이지로 이동합니다.");
-    window.location.href = "../login.html";
+  const user = window.LSMS_USER;
+  if (!user) {
+    alert("로그인 정보가 없습니다. 포털 화면에서 다시 로그인해 주세요.");
+    window.location.href = "/index.html";
     return;
   }
-  let user;
-  try {
-    user = JSON.parse(raw);
-  } catch (e) {
-    alert("로그인 정보가 손상되었습니다. 다시 로그인해 주세요.");
-    window.location.href = "../login.html";
-    return;
-  }
-  if (!user || user.role !== "admin") {
+  if (!user.role || user.role !== "admin") {
     alert("관리자 계정만 접근 가능한 화면입니다.");
     window.location.href = "index.html";
     return;

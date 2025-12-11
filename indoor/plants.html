@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-scope="indoor">
 <head>
   <meta charset="UTF-8" />
   <title>LSMS INDOOR · 식물 관리</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- 🔐 실내조경 로그인/권한 체크 -->
-  <script src="../js/indoor-auth.js" defer></script>
+  <!-- 🔐 공통 로그인/인증 (실내/실외 구분은 data-scope 로 처리) -->
+  <script src="../js/lsms-auth.js" defer></script>
 
   <!-- 공통 CSS -->
   <link rel="stylesheet" href="../css/outdoor-style.css" />
