@@ -492,21 +492,12 @@ function setTreeFormEditable(editable) {
 }
 
 // ===== 서버 연동 (원하면 사용) =====
+// 현재 서버 PHP(/api/trees-load.php)가 JSON을 반환하지 않기 때문에
+// 기본 상태 모듈(LSMS.outdoor)의 tree 데이터를 그대로 쓰도록 고정한다.
 async function loadTreesFromServer() {
-  try {
-    const res = await fetch("/api/trees-load.php?ts=" + Date.now(), {
-      cache: "no-store",
-    });
-    if (!res.ok) throw new Error("load fail");
-    const data = await res.json();
-    if (Array.isArray(data) && data.length) {
-      setTreeData(data);
-      return;
-    }
-  } catch (err) {
-    console.warn("서버에서 수목 데이터 로드 실패, 기본값 사용", err);
-  }
-  // 서버 데이터가 없거나 실패한 경우, 현재 상태 모듈의 기본값으로 렌더
+  console.warn(
+    "loadTreesFromServer: 서버 연동 비활성화, LSMS.outdoor 기본 데이터 사용"
+  );
   renderTrees();
 }
 
