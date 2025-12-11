@@ -304,36 +304,75 @@ function showRiskDetailPopup(tree) {
 window.recalcAllTreeRisks = recalcAllTreeRisks;
 window.renderRiskTop5 = renderRiskTop5;
 
-// ===== 콘솔용 테스트 함수 =====
-// 예) testRisk("YA-001", { wind_max: 16, rain_3d: 80, snow_cm: 0 });
-window.testRisk = function testRisk(treeId, overrideWeather) {
-  if (!Array.isArray(window.treeData)) {
-    console.warn("treeData 가 없습니다.");
-    return null;
+// ===== 디버깅용 전도 위험 테스트 함수 =====
+// 사용 예시:
+//   testRisk("YA-001");
+//   testRisk("YA-001", { wind_max: 15, rain_mm: 80, snow_cm: 0 });
+window.testRisk = function (treeId, overrideWeather) {
+  try {
+    if (!window.treeData || !Array.isArray(window.treeData)) {
+      console.error("[testRisk] window.treeData가 없습니다.");
+      return;
+    }
+
+    const tree = window.treeData.find((t) => t.id === treeId);
+    if (!tree) {
+      console.error("[testRisk] 해당 ID의 수목을 찾을 수 없습니다:", treeId);
+      return;
+    }
+
+    // 1) 기본 전도 위험(지형·수목 조건 기반)
+    let baseResult = null;
+    if (typeof window.computeBaseRisk === "function") {
+      baseResult = window.computeBaseRisk(tree);
+    }
+
+    // 2) 기상 요인(바람·비·눈 등) 영향
+    // computeWeatherFactor(weather) 시그니처에 맞춰 한 개 인자만 전달
+    const weatherInput = overrideWeather || {};
+    let weatherResult = null;
+    if (typeof window.computeWeatherFactor === "function") {
+      weatherResult = window.computeWeatherFactor(weatherInput);
+    }
+
+    // 3) 최종 전도 위험 점수(임시 계산)
+    const baseScore =
+      baseResult && typeof baseResult === "object"
+        ? baseResult.score ?? baseResult.risk_score ?? 0
+        : typeof baseResult === "number"
+        ? baseResult
+        : 0;
+
+    const weatherScore =
+      weatherResult && typeof weatherResult === "object"
+        ? weatherResult.score ?? weatherResult.weather_score ?? 1
+        : typeof weatherResult === "number"
+        ? weatherResult
+        : 1;
+
+    const finalScore = Math.round(baseScore * weatherScore);
+
+    console.log("risk_base ▶", baseResult);
+    console.log("risk_weather ▶", weatherResult);
+    console.log("risk_instant ▶", {
+      score: finalScore,
+      baseScore,
+      weatherScore,
+    });
+
+    return {
+      treeId,
+      base: baseResult,
+      weather: weatherResult,
+      instant: {
+        score: finalScore,
+        baseScore,
+        weatherScore,
+      },
+    };
+  } catch (err) {
+    console.error("[testRisk] 실행 중 오류 발생:", err);
   }
-
-  const original = window.treeData.find((t) => t.id === treeId);
-  if (!original) {
-    console.warn("해당 ID의 수목을 찾을 수 없습니다:", treeId);
-    return null;
-  }
-
-  const weatherBase = window.LSMS_WEATHER_TODAY || {};
-  const weather = Object.assign({}, weatherBase, overrideWeather || {});
-
-  // 원본 객체를 건드리지 않기 위해 얕은 복사
-  const copy = JSON.parse(JSON.stringify(original));
-  const result = computeTreeRisk(copy, weather);
-
-  console.log("=== testRisk 결과 ===");
-  console.log("treeId:", treeId);
-  console.log("weather:", weather);
-  console.log("risk_base:", result.risk_base);
-  console.log("risk_weather:", result.risk_weather);
-  console.log("risk_instant:", result.risk_instant, "level:", result.risk_level);
-  console.log("detail:", result._risk_detail);
-
-  return result;
 };
 
 // ===== LSMS 두뇌 서버 전도 위험 테스트 (기존 기능 유지) =====
